@@ -1,0 +1,2630 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metadata Ultra Studio — Created by Arafat hossain</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#131c2e',
+                            900: '#0f172a',
+                            950: '#070b14',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #070b14;
+            color: #f8fafc;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .keyword-chip { transition: all 0.15s ease; }
+        .keyword-chip:hover { transform: translateY(-1px); }
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .scanner-beam {
+            background: linear-gradient(to bottom, transparent, rgba(99, 102, 241, 0.4), transparent);
+            animation: scanline 1.6s infinite linear;
+        }
+        @keyframes rgbTextFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .rgb-author-name {
+            background: linear-gradient(90deg, #ff0055, #ffaa00, #00ff66, #00ccff, #7700ff, #ff00aa, #ff0055);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rgbTextFlow 4s ease infinite;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+        }
+        .rgb-badge-border {
+            position: relative;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            box-shadow: 0 0 15px -3px rgba(236, 72, 153, 0.25), 0 0 10px -4px rgba(59, 130, 246, 0.25);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white overflow-x-hidden">
+
+    <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 lg:px-6 py-3">
+        <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-4">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i class="ph-bold ph-eye text-white text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h1 class="font-bold text-lg tracking-tight text-white">Metadata <span class="text-indigo-400">Ultra Studio</span></h1>
+                        <span class="rgb-badge-border text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                            <i class="ph-fill ph-crown text-amber-400 text-xs"></i>
+                            <span class="text-slate-300 font-medium">Created by</span>
+                            <span class="rgb-author-name">Arafat hossain</span>
+                        </span>
+                        <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hidden xl:inline-block">Dual-Mode Engine</span>
+                    </div>
+                    <p class="text-xs text-slate-400 hidden sm:block">4-Tier Buyer SEO Hierarchy • 100% Visual Truth (Temp 0.15) • Smart Stemmer • Exact 45 Pure Tags</p>
+                </div>
+            </div>
+
+            <!-- Target Platform Compliance Selector -->
+            <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button onclick="setPlatform('adobe')" id="tab-adobe" class="platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-indigo-600 text-white shadow">
+                    <i class="ph-fill ph-file-csv"></i> Adobe Stock
+                </button>
+                <button onclick="setPlatform('shutterstock')" id="tab-shutterstock" class="platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-white">
+                    <i class="ph-fill ph-camera"></i> Shutterstock
+                </button>
+                <button onclick="setPlatform('freepik')" id="tab-freepik" class="platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-white">
+                    <i class="ph-fill ph-vector-three"></i> Freepik
+                </button>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-2.5">
+                <button onclick="downloadAllEmbeddedJPGs()" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition" title="Embed Title & 45 Keywords into ALL uploaded JPGs losslessly">
+                    <i class="ph-bold ph-images"></i>
+                    <span>Embed All JPGs</span>
+                </button>
+                <button onclick="openModal('apiModal')" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium transition">
+                    <i class="ph-bold ph-sliders text-amber-400"></i>
+                    <span id="apiStatusText">Engine & API Settings</span>
+                </button>
+                <button onclick="openExportModal()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold text-xs shadow-lg shadow-emerald-600/20 transition">
+                    <i class="ph-bold ph-download-simple text-sm"></i>
+                    <span>Export CSV</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-[1600px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 lg:p-6">
+        
+        <!-- LEFT PANEL: Upload Dropzone, Asset Type Controls & Queue (4 Columns) -->
+        <section class="lg:col-span-4 flex flex-col gap-4">
+            
+            <!-- Multi-Format Dropzone -->
+            <div id="dropzone" class="relative group border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-2xl bg-slate-900/70 p-5 text-center transition-all cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" multiple accept="image/*,video/mp4,video/webm,video/quicktime,.eps,.ai,application/postscript,application/eps,application/x-eps,image/x-eps" class="hidden" onchange="handleFileSelect(event)">
+                <input type="file" id="epsPreviewAttachInput" accept="image/jpeg,image/png,image/webp,image/svg+xml" class="hidden" onchange="handleAttachEPSPreview(event)">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-2.5 group-hover:scale-110 transition-transform">
+                    <i class="ph-duotone ph-scan text-2xl text-indigo-400"></i>
+                </div>
+                <p class="text-sm font-semibold text-white">Drop Photo, Direct .EPS / .SVG Vector, Video or AI Art</p>
+                <p class="text-xs text-slate-400 mt-1">Supports <span class="text-indigo-300 font-mono">EPS, AI, SVG, JPG, PNG, WEBP, MP4, MOV</span></p>
+                <p class="text-[10px] text-emerald-400/90 mt-1 font-medium"><i class="ph-fill ph-sparkle"></i> Pro Tip: Drop <code class="font-mono">file.eps + file.jpg</code> together for Auto-Pair 1536px HD, or drop single <code class="font-mono">.eps</code> directly!</p>
+                
+                <!-- Quick Preset Mode before uploading -->
+                <div class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-1.5" onclick="event.stopPropagation()">
+                    <span class="text-[11px] text-slate-400 mr-1">Default Upload Mode:</span>
+                    <select id="defaultAssetTypeSelect" class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-[11px] text-indigo-300 font-medium focus:outline-none">
+                        <option value="auto">Auto-Detect by AI Vision</option>
+                        <option value="photo">Commercial Photo</option>
+                        <option value="vector">Vector Illustration (EPS/SVG)</option>
+                        <option value="ai">Generative AI Art</option>
+                        <option value="video">Stock Video Footage (MP4)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Batch Queue & AI Controls -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3 flex-1">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-sm font-semibold text-white">Batch Queue</h2>
+                        <span id="assetCountBadge" class="px-2 py-0.5 text-xs font-mono rounded-md bg-slate-800 text-slate-300">0</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="analyzeAllWithAIVision()" id="batchAiBtn" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow transition">
+                            <i class="ph-bold ph-sparkle"></i> Analyze All (AI Vision)
+                        </button>
+                        <button onclick="openModal('bulkModal')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium flex items-center gap-1 transition" title="Bulk tools & EPS extension swapper">
+                            <i class="ph ph-gear"></i> Bulk
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Batch Progress Bar -->
+                <div id="batchProgressContainer" class="hidden bg-slate-950 p-2.5 rounded-xl border border-indigo-500/30 space-y-1.5">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span id="batchProgressText" class="text-indigo-300 font-medium flex items-center gap-1.5">
+                            <i class="ph ph-spinner animate-spin"></i> Scanning pixels with AI Vision...
+                        </span>
+                        <span id="batchProgressPercent" class="font-mono text-slate-400">0/0</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div id="batchProgressBar" class="h-full bg-indigo-500 transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Queue Status Counters -->
+                <div class="grid grid-cols-3 gap-2 text-center bg-slate-950 p-2 rounded-xl border border-slate-800/80 text-xs">
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase">Total Files</span>
+                        <span id="statTotal" class="font-mono font-semibold text-white">0</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase">100% Ready</span>
+                        <span id="statReady" class="font-mono font-semibold text-emerald-400">0</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase">Pending Scan</span>
+                        <span id="statIncomplete" class="font-mono font-semibold text-amber-400">0</span>
+                    </div>
+                </div>
+
+                <!-- Scrollable Asset Queue List -->
+                <div id="assetList" class="flex-1 overflow-y-auto space-y-2 max-h-[480px] pr-1"></div>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL: Deep Vision Inspector & Keyword Studio (8 Columns) -->
+        <section class="lg:col-span-8 flex flex-col gap-5">
+            
+            <!-- Empty State -->
+            <div id="emptyInspector" class="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center my-auto space-y-4">
+                <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto">
+                    <i class="ph-duotone ph-camera-plus text-3xl text-indigo-400"></i>
+                </div>
+                <div class="max-w-md mx-auto">
+                    <h3 class="text-lg font-bold text-white">Upload Any Photo, Vector, Video or AI Art</h3>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                        Even if your file is named <code class="text-indigo-300 font-mono">IMG_0001.jpg</code>, our 4-Tier Visual SEO Engine inspects the actual visual subject, buyer concepts, micro-details, and composition to generate <strong>exact 45 high-converting keywords</strong>.
+                    </p>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+                    <button onclick="document.getElementById('fileInput').click()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition">
+                        <i class="ph-bold ph-upload-simple"></i> Upload Your Own Files
+                    </button>
+                    <button onclick="loadSampleTestAssets()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium flex items-center gap-2 transition">
+                        <i class="ph-bold ph-flask text-emerald-400"></i> Load Blind Test Samples (IMG_001.jpg)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Asset Inspector -->
+            <div id="activeInspector" class="hidden flex-col gap-5">
+                
+                <!-- Top Visual Scanner & AI Breakdown Card -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+                    
+                    <!-- Visual Preview Box with Scanner Animation -->
+                    <div class="md:col-span-4 relative rounded-xl overflow-hidden bg-slate-950 border border-slate-800 aspect-video md:aspect-[4/3] flex items-center justify-center">
+                        <img id="inspectorImage" src="" alt="Asset Preview" class="w-full h-full object-contain">
+                        <div id="scannerOverlay" class="hidden absolute inset-0 scanner-beam pointer-events-none"></div>
+                        <div class="absolute top-2 left-2 flex flex-wrap items-center gap-1.5">
+                            <span id="assetMediaTypeBadge" class="px-2 py-0.5 rounded-md text-[10px] font-mono uppercase font-semibold bg-slate-950/90 text-indigo-300 border border-slate-700">PHOTO</span>
+                            <span id="losslessQualityBadge" class="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-emerald-950/90 text-emerald-300 border border-emerald-700" title="Original resolution and file quality are 100% untouched">100% ORIGINAL QUALITY</span>
+                            <span id="videoGridBadge" class="hidden px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-purple-950/90 text-purple-300 border border-purple-700">2×2 TEMPORAL GRID</span>
+                            <span id="epsModeBadge" class="hidden px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-emerald-950/90 text-emerald-300 border border-emerald-700">DIRECT .EPS</span>
+                        </div>
+                        <div id="colorPaletteBar" class="absolute top-2 right-2 flex items-center gap-1 bg-slate-950/90 px-1.5 py-1 rounded-md border border-slate-800" title="Dominant Canvas Colors"></div>
+                        <div class="absolute bottom-2 left-2 right-2 bg-slate-950/90 backdrop-blur-md px-2.5 py-1.5 rounded-lg border border-slate-800 flex items-center justify-between text-[11px]">
+                            <span id="inspectorFilename" class="font-mono text-slate-200 truncate max-w-[150px]">IMG_0001.jpg</span>
+                            <div class="flex items-center gap-1.5">
+                                <button id="attachEpsPreviewBtn" onclick="triggerAttachEPSPreview()" class="hidden px-2 py-0.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-medium transition" title="Attach high-res JPG/PNG preview to this EPS file">+ HD Preview</button>
+                                <span id="inspectorDimensions" class="text-slate-400 font-mono">4000×2667</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Vision Analysis Controls & Diagnostics -->
+                    <div class="md:col-span-8 flex flex-col justify-between gap-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="text-xs uppercase tracking-wider font-semibold text-indigo-400" id="activePlatformLabel">Adobe Stock Compliance</span>
+                                    <span id="healthBadge" class="text-xs px-2.5 py-0.5 rounded-full font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">100% Ready</span>
+                                    <span id="releaseNoticeBadge" class="hidden text-[10px] px-2 py-0.5 rounded-full font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30">Release Check</span>
+                                    <span id="stemmedNoticeBadge" class="hidden text-[10px] px-2 py-0.5 rounded-full font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">Plurals Filtered</span>
+                                </div>
+                                <p id="aiVisualSummary" class="text-xs text-slate-400 mt-1">Click "Deep Scan 1536px" for 4-Tier Visual SEO Reasoning.</p>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button onclick="downloadMetadataEmbeddedJPG()" id="embedXmpBtn" class="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 font-semibold text-xs flex items-center gap-1.5 transition" title="100% Lossless: Embeds Title & 45 Keywords directly into your ORIGINAL full-resolution file without re-compressing pixels">
+                                    <i class="ph-bold ph-file-jpg"></i>
+                                    <span class="hidden sm:inline">Lossless Embed JPG</span>
+                                </button>
+                                <button onclick="analyzeCurrentWithAIVision()" id="aiGenerateBtn" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 hover:opacity-95 text-white font-semibold text-xs shadow-lg shadow-indigo-500/20 flex items-center gap-2 transition">
+                                    <i class="ph-bold ph-eye"></i>
+                                    <span>Deep Scan 1536px (Exact 45 Tags)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Custom Contributor Hint Box -->
+                        <div class="flex items-center gap-2 bg-indigo-950/20 border border-indigo-500/30 rounded-xl px-3 py-1.5">
+                            <i class="ph-fill ph-lightbulb text-amber-400 text-sm flex-shrink-0"></i>
+                            <input type="text" id="customHintInput" oninput="updateCurrentField('customHint', this.value)" placeholder="Optional Context Hint for AI (e.g., 'Ramadan celebration in Dhaka', 'Cybersecurity concept', 'Isometric vector')..." class="w-full bg-transparent text-xs text-white placeholder-slate-400 focus:outline-none">
+                        </div>
+
+                        <!-- Asset Type & Vector Extension Pairing Bar -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-400 whitespace-nowrap">Media Type:</span>
+                                <select id="assetTypeSelect" onchange="updateCurrentAssetType(this.value)" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-indigo-500 focus:outline-none">
+                                    <option value="photo">Commercial Photo</option>
+                                    <option value="vector">Vector Graphic (EPS / SVG)</option>
+                                    <option value="ai">Generative AI Art</option>
+                                    <option value="video">Video Footage (4-Frame Grid)</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-400 whitespace-nowrap">CSV Filename:</span>
+                                <input type="text" id="filenameInput" oninput="updateCurrentFilename(this.value)" class="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white flex-1 focus:border-indigo-500 focus:outline-none" placeholder="exact_file.jpg">
+                                <button onclick="swapCurrentExtensionToEPS()" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[10px] font-mono text-indigo-300" title="Swap extension to .eps for vector submission">.eps</button>
+                            </div>
+                        </div>
+
+                        <!-- 5-Layer Chain-of-Thought Breakdown Pills -->
+                        <div id="fiveLayerBreakdown" class="hidden grid-cols-2 sm:grid-cols-5 gap-1.5 text-[10px]"></div>
+
+                        <!-- Live Compliance Validation Grid -->
+                        <div id="validationChecks" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"></div>
+                    </div>
+                </div>
+
+                <!-- Commercial SEO Title & Official Categories Card -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-4">
+                    <div>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                            <label for="titleInput" class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                                <i class="ph-bold ph-text-t text-indigo-400"></i>
+                                Buyer-Searchable Commercial Title <span class="text-[10px] font-normal text-slate-400">(Formula: Subject + Action + Setting + Commercial Purpose/Copy Space)</span>
+                            </label>
+                            <div class="flex items-center gap-2 text-xs font-mono">
+                                <button onclick="copyTitleToClipboard()" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-indigo-300 text-[11px] font-sans flex items-center gap-1">
+                                    <i class="ph ph-copy"></i> Copy Title
+                                </button>
+                                <span id="titleWordCount" class="text-slate-400">0 words</span>
+                                <span id="titleCharCount" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">0 / 200 chars</span>
+                            </div>
+                        </div>
+                        <textarea id="titleInput" rows="2" oninput="updateCurrentTitle(this.value)" placeholder="Click 'Deep Scan 1536px' to generate a 100% accurate commercial title from visual content..." class="w-full rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none p-3 text-sm text-white placeholder-slate-500 transition resize-none"></textarea>
+                    </div>
+
+                    <!-- Auto-Detected Categories & Flags -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-800">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Adobe Stock Category (Auto-Detected 1–21)</label>
+                            <select id="adobeCategorySelect" onchange="updateCurrentField('adobeCategory', Number(this.value))" class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Shutterstock Primary Category</label>
+                            <select id="shutterCategory1Select" onchange="updateCurrentField('shutterCategory1', this.value)" class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Shutterstock Secondary & AI Flag</label>
+                            <div class="flex items-center gap-2">
+                                <select id="shutterCategory2Select" onchange="updateCurrentField('shutterCategory2', this.value)" class="flex-1 rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none"></select>
+                                <label class="flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 cursor-pointer select-none" title="Auto-checked for Generative AI">
+                                    <input type="checkbox" id="aiGeneratedCheck" onchange="updateCurrentField('isAIGenerated', this.checked)" class="rounded text-indigo-500 focus:ring-0">
+                                    <span>AI Art</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 45-Keyword Hierarchical Studio -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <label class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                                <i class="ph-bold ph-hash text-indigo-400"></i>
+                                45-Keyword Precision Studio
+                            </label>
+                            <span id="keywordCountBadge" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">0 / 45 Target</span>
+                            <span class="text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">Top 1–10 Golden SEO Core • 11–25 Buyer Concepts</span>
+                        </div>
+
+                        <!-- Keyword Utility Buttons -->
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <button onclick="copyKeywordsToClipboard()" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-medium flex items-center gap-1 transition">
+                                <i class="ph ph-copy"></i> Copy All Keywords
+                            </button>
+                            <button onclick="cleanAndDedupeKeywords()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs flex items-center gap-1 transition">
+                                <i class="ph ph-broom"></i> Clean & Dedupe
+                            </button>
+                            <button onclick="clearKeywords()" class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs flex items-center gap-1 transition">
+                                <i class="ph ph-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Manual Add Bar -->
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" id="keywordAddInput" onkeydown="if(event.key==='Enter'){event.preventDefault(); addKeywordsFromInput();}" placeholder="Add custom keyword(s) separated by comma and press Enter (Auto-Stemmed & Trademark Checked)..." class="w-full rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none px-3 py-2 text-xs text-white placeholder-slate-500">
+                        </div>
+                        <button onclick="addKeywordsFromInput()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition">
+                            + Add Tag
+                        </button>
+                    </div>
+
+                    <!-- Interactive Keyword Chips Container -->
+                    <div id="keywordChipsContainer" class="min-h-[140px] p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex flex-wrap content-start gap-2"></div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 bg-slate-950/70 px-3 py-2 rounded-xl border border-slate-800/80">
+                        <div class="flex items-center gap-2">
+                            <i class="ph-fill ph-shield-check text-emerald-400"></i>
+                            <span id="stemmerReportText">Smart Stemmer Active: Protects words like 'business/series/lens' while blocking plural spam (woman/women, leaf/leaves).</span>
+                        </div>
+                        <button onclick="topUpToExactTarget()" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+                            <i class="ph-bold ph-magic-wand"></i> Force Exact 45 Keywords
+                        </button>
+                    </div>
+
+                    <!-- Raw Comma-Separated String Editor -->
+                    <details class="group bg-slate-950/60 rounded-xl border border-slate-800/80 px-3 py-2">
+                        <summary class="text-xs font-medium text-slate-400 cursor-pointer flex items-center justify-between select-none">
+                            <span><i class="ph ph-brackets-curly mr-1"></i> Raw Comma-Separated Keywords (Click to view or edit raw string)</span>
+                            <i class="ph ph-caret-down group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <textarea id="rawKeywordsTextarea" rows="2" onchange="syncFromRawTextarea(this.value)" class="w-full mt-2 bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
+                    </details>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-800/80 bg-slate-900/60 py-3 px-4 lg:px-6 text-center text-xs text-slate-400">
+        <div class="max-w-[1600px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="font-semibold text-white">Metadata Ultra Studio</span>
+                <span>— Professional AI Vision & Stock SEO Solution</span>
+            </div>
+            <div class="rgb-badge-border px-3 py-1 rounded-full inline-flex items-center gap-1.5 text-xs">
+                <i class="ph-fill ph-sparkle text-amber-400"></i>
+                <span class="text-slate-300">Created by</span>
+                <span class="rgb-author-name text-sm">Arafat hossain</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: CSV Export & Live Preview -->
+    <div id="exportModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="ph-fill ph-file-csv text-emerald-400 text-xl"></i>
+                        Export 100% Agency-Compliant CSV
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Includes UTF-8 BOM & RFC-4180 escaping so Adobe Stock, Shutterstock & Freepik accept every row without errors.</p>
+                </div>
+                <button onclick="closeModal('exportModal')" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800">
+                    <i class="ph ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <label onclick="updateExportPreview('adobe')" id="exportCard-adobe" class="cursor-pointer p-3.5 rounded-xl border-2 border-indigo-500 bg-indigo-500/10 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm text-white">Adobe Stock CSV</span>
+                            <i class="ph-fill ph-check-circle text-indigo-400 text-lg"></i>
+                        </div>
+                        <p class="text-[11px] text-slate-300 mt-1 font-mono">Filename, Title, Keywords, Category, Releases</p>
+                    </label>
+                    <label onclick="updateExportPreview('shutterstock')" id="exportCard-shutterstock" class="cursor-pointer p-3.5 rounded-xl border-2 border-slate-800 bg-slate-950 hover:border-slate-700 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm text-white">Shutterstock CSV</span>
+                            <i class="ph ph-circle text-slate-500 text-lg"></i>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1 font-mono">Filename, Description, Keywords, Categories, Editorial...</p>
+                    </label>
+                    <label onclick="updateExportPreview('freepik')" id="exportCard-freepik" class="cursor-pointer p-3.5 rounded-xl border-2 border-slate-800 bg-slate-950 hover:border-slate-700 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm text-white">Freepik CSV</span>
+                            <i class="ph ph-circle text-slate-500 text-lg"></i>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1 font-mono">Filename, Title, Keywords</p>
+                    </label>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Live CSV Output Preview</span>
+                        <button onclick="copyRawCSV()" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+                            <i class="ph ph-copy"></i> Copy Raw CSV Text
+                        </button>
+                    </div>
+                    <pre id="csvPreviewBox" class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-300 overflow-x-auto max-h-60 whitespace-pre"></pre>
+                </div>
+            </div>
+
+            <div class="p-4 sm:p-5 border-t border-slate-800 bg-slate-950/50 flex flex-wrap items-center justify-between gap-3">
+                <div class="text-xs text-slate-400">
+                    Vector Contributor Tip: Use the <strong>Bulk -> Swap .jpg to .eps</strong> button if your agency requires `.eps` in the CSV filename column.
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="closeModal('exportModal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Close</button>
+                    <button onclick="downloadCSVFile()" class="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+                        <i class="ph-bold ph-download-simple"></i> Download .CSV File
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Lifetime AI Vision Settings & Model Selector -->
+    <div id="apiModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="ph-fill ph-eye text-indigo-400"></i>
+                    Dual-Mode AI Vision Configuration (Server + API Key)
+                </h3>
+                <button onclick="closeModal('apiModal')" class="text-slate-400 hover:text-white"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-200 leading-relaxed space-y-1">
+                <p><strong>1. Inside Gemini Canvas Preview:</strong> Works automatically without any API key using the built-in Gemini 3 Flash Vision server.</p>
+                <p><strong>2. Downloaded on Your PC / Browser:</strong> Paste your free Google AI Studio API Key below once—it saves in your browser for lifetime use!</p>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Google Gemini API Key (Optional in Preview, Saved for Lifetime on PC)</label>
+                <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy... (Leave blank in Canvas Preview, or paste key for PC)" class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs font-mono text-white focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Gemini Vision Model</label>
+                    <select id="geminiModelSelect" onchange="toggleCustomModelInput()" class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs font-mono text-white">
+                        <option value="gemini-3-flash-preview">gemini-3-flash-preview (Default & Preview)</option>
+                        <option value="gemini-2.5-flash">gemini-2.5-flash (Fast & Stable)</option>
+                        <option value="gemini-2.5-pro">gemini-2.5-pro (Deepest Reasoning)</option>
+                        <option value="custom">Custom Future Model ID...</option>
+                    </select>
+                </div>
+                <div id="customModelWrapper" class="hidden">
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Custom Model Name</label>
+                    <input type="text" id="customModelInput" placeholder="e.g., gemini-3.5-pro" class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs font-mono text-white">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Exact Keyword Target</label>
+                    <input type="number" id="targetKwCountInput" value="45" min="25" max="49" class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs font-mono text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Keyword Format Strategy</label>
+                    <select id="kwStyleSelect" class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs text-white">
+                        <option value="hybrid">High-Ranking Hybrid (Single + Buyer Phrases)</option>
+                        <option value="single">Strict Single Words Only</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                <button onclick="saveApiConfig()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">Save Lifetime Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Bulk Vector / Video / Keyword Operations -->
+    <div id="bulkModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="ph-bold ph-stack text-indigo-400"></i>
+                    Bulk Contributor Power Tools
+                </h3>
+                <button onclick="closeModal('bulkModal')" class="text-slate-400 hover:text-white"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                    <p class="text-xs font-semibold text-white">Vector Preview Extension Swapper (.jpg → .eps / .svg)</p>
+                    <p class="text-[11px] text-slate-400">Uploaded JPG previews of your vectors? Convert all CSV filenames to `.eps` or `.ai` with one click:</p>
+                    <div class="flex gap-2">
+                        <button onclick="bulkSwapExtension('.eps')" class="flex-1 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-mono">All to .eps</button>
+                        <button onclick="bulkSwapExtension('.svg')" class="flex-1 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono">All to .svg</button>
+                        <button onclick="bulkSwapExtension('.jpg')" class="flex-1 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono">All to .jpg</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Append Keywords to All Assets (Up to 49 limit)</label>
+                    <input type="text" id="bulkKeywordsInput" placeholder="e.g., copy space, commercial, high quality" class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs text-white">
+                </div>
+                <button onclick="applyBulkAppendKeywords()" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition">
+                    Append Keywords to All Assets
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        const ADOBE_CATEGORIES = [
+            { id: 1, name: "1 - Animals" },
+            { id: 2, name: "2 - Buildings and Architecture" },
+            { id: 3, name: "3 - Business" },
+            { id: 4, name: "4 - Drinks" },
+            { id: 5, name: "5 - The Environment" },
+            { id: 6, name: "6 - States of Mind" },
+            { id: 7, name: "7 - Food" },
+            { id: 8, name: "8 - Graphic Resources" },
+            { id: 9, name: "9 - Hobbies and Leisure" },
+            { id: 10, name: "10 - Industry" },
+            { id: 11, name: "11 - Landscapes" },
+            { id: 12, name: "12 - Lifestyle" },
+            { id: 13, name: "13 - People" },
+            { id: 14, name: "14 - Plants and Flowers" },
+            { id: 15, name: "15 - Culture and Religion" },
+            { id: 16, name: "16 - Science" },
+            { id: 17, name: "17 - Social Issues" },
+            { id: 18, name: "18 - Sports" },
+            { id: 19, name: "19 - Technology" },
+            { id: 20, name: "20 - Transport" },
+            { id: 21, name: "21 - Travel" }
+        ];
+
+        const SHUTTERSTOCK_CATEGORIES = [
+            "Abstract", "Animals/Wildlife", "Arts", "Backgrounds/Textures", "Beauty/Fashion",
+            "Buildings/Landmarks", "Business/Finance", "Celebrities", "Education", "Food and Drink",
+            "Healthcare/Medical", "Holidays", "Industrial", "Interiors", "Miscellaneous",
+            "Nature", "Objects", "Parks/Outdoor", "People", "Religion",
+            "Science", "Signs/Symbols", "Sports/Recreation", "Technology", "Transportation", "Vintage"
+        ];
+
+        const BANNED_TERMS = [
+            "iphone", "apple", "macbook", "ipad", "nike", "adidas", "puma", "coca-cola", "coca cola", "pepsi",
+            "disney", "marvel", "canon", "nikon", "sony", "fujifilm", "panasonic", "gopro",
+            "4k", "8k", "hd", "uhd", "dslr", "raw", "jpg", "jpeg", "png", "eps", "svg", "mp4",
+            "ferrari", "porsche", "lamborghini", "tesla", "bmw", "mercedes", "rolex", "gucci",
+            "louis vuitton", "lego", "minecraft", "roblox", "youtube", "instagram", "tiktok",
+            "facebook", "whatsapp", "netflix", "spotify", "amazon", "google", "microsoft", "windows",
+            "photoshop", "illustrator", "midjourney", "dall-e", "dalle", "stable diffusion",
+            "stunning", "breathtaking", "mesmerizing", "masterpiece", "hyperrealistic", "award winning", "trending on artstation"
+        ];
+
+        const IRREGULAR_PLURALS = {
+            women: 'woman', men: 'man', children: 'child', people: 'person',
+            leaves: 'leaf', lives: 'life', wolves: 'wolf', knives: 'knife',
+            halves: 'half', loaves: 'loaf', berries: 'berry', cities: 'city',
+            families: 'family', ladies: 'lady', babies: 'baby', countries: 'country',
+            companies: 'company', stories: 'story', studies: 'study', parties: 'party',
+            feet: 'foot', teeth: 'tooth', geese: 'goose', mice: 'mouse',
+            cacti: 'cactus', fungi: 'fungus', phenomena: 'phenomenon', criteria: 'criterion',
+            movies: 'movie', cookies: 'cookie', smoothies: 'smoothie', brownies: 'brownie',
+            series: 'series', species: 'species', lens: 'lens', business: 'business',
+            canvas: 'canvas', glass: 'glass', grass: 'grass', dress: 'dress',
+            stress: 'stress', success: 'success', wellness: 'wellness', fitness: 'fitness',
+            happiness: 'happiness', darkness: 'darkness', awareness: 'awareness',
+            progress: 'progress', process: 'process', analysis: 'analysis',
+            crisis: 'crisis', oasis: 'oasis', metropolis: 'metropolis',
+            cosmos: 'cosmos', chaos: 'chaos', ethos: 'ethos', pathos: 'pathos',
+            virus: 'virus', status: 'status', campus: 'campus', focus: 'focus',
+            lotus: 'lotus', citrus: 'citrus', apparatus: 'apparatus', nexus: 'nexus',
+            christmas: 'christmas', atlas: 'atlas', tapas: 'tapas', pajamas: 'pajamas',
+            headphones: 'headphones', eyeglasses: 'eyeglasses', sunglasses: 'sunglasses',
+            scissors: 'scissors', clothes: 'clothes', stairs: 'stairs', outdoors: 'outdoor',
+            indoors: 'indoor', sports: 'sport', news: 'news', mathematics: 'mathematics',
+            economics: 'economics', politics: 'politics', robotics: 'robotics',
+            genetics: 'genetics', logistics: 'logistics', analytics: 'analytics',
+            graphics: 'graphic', dynamics: 'dynamic', ethics: 'ethic'
+        };
+
+        let assets = [];
+        let activeAssetId = null;
+        let currentPlatform = 'adobe';
+        let exportPlatform = 'adobe';
+        let userCustomApiKey = '';
+        let selectedGeminiModel = 'gemini-3-flash-preview';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSavedSettings();
+            populateCategoryDropdowns();
+            setupDragAndDrop();
+            renderAll();
+        });
+
+        function loadSavedSettings() {
+            try {
+                const savedKey = localStorage.getItem('metastock_api_key');
+                const savedModel = localStorage.getItem('metastock_model');
+                const savedCustomModel = localStorage.getItem('metastock_custom_model');
+                const savedTargetKw = localStorage.getItem('metastock_target_kw');
+                const savedKwStyle = localStorage.getItem('metastock_kw_style');
+
+                if (savedKey) {
+                    userCustomApiKey = savedKey;
+                    document.getElementById('geminiApiKeyInput').value = savedKey;
+                    document.getElementById('apiStatusText').textContent = 'Custom API Key Active ✓';
+                }
+                if (savedModel) {
+                    document.getElementById('geminiModelSelect').value = savedModel;
+                    toggleCustomModelInput();
+                }
+                if (savedCustomModel) {
+                    document.getElementById('customModelInput').value = savedCustomModel;
+                }
+                if (savedTargetKw) {
+                    document.getElementById('targetKwCountInput').value = savedTargetKw;
+                }
+                if (savedKwStyle) {
+                    document.getElementById('kwStyleSelect').value = savedKwStyle;
+                }
+                updateSelectedModelVariable();
+            } catch (e) {
+                console.warn('localStorage not available:', e);
+            }
+        }
+
+        function toggleCustomModelInput() {
+            const sel = document.getElementById('geminiModelSelect').value;
+            const wrap = document.getElementById('customModelWrapper');
+            if (sel === 'custom') {
+                wrap.classList.remove('hidden');
+            } else {
+                wrap.classList.add('hidden');
+            }
+        }
+
+        function updateSelectedModelVariable() {
+            const sel = document.getElementById('geminiModelSelect').value;
+            const custom = document.getElementById('customModelInput').value.trim();
+            selectedGeminiModel = (sel === 'custom' && custom) ? custom : (sel === 'custom' ? 'gemini-3-flash-preview' : sel);
+        }
+
+        function populateCategoryDropdowns() {
+            const adobeSel = document.getElementById('adobeCategorySelect');
+            adobeSel.innerHTML = ADOBE_CATEGORIES.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+            const shutter1 = document.getElementById('shutterCategory1Select');
+            const shutter2 = document.getElementById('shutterCategory2Select');
+            shutter1.innerHTML = SHUTTERSTOCK_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+            shutter2.innerHTML = `<option value="">None (Optional)</option>` + SHUTTERSTOCK_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        function setupDragAndDrop() {
+            const dz = document.getElementById('dropzone');
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+                dz.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); });
+            });
+            ['dragenter', 'dragover'].forEach(evt => {
+                dz.addEventListener(evt, () => dz.classList.add('border-indigo-500', 'bg-indigo-500/5'));
+            });
+            ['dragleave', 'drop'].forEach(evt => {
+                dz.addEventListener(evt, () => dz.classList.remove('border-indigo-500', 'bg-indigo-500/5'));
+            });
+            dz.addEventListener('drop', e => {
+                const files = e.dataTransfer.files;
+                if (files && files.length) processUploadedFiles(files);
+            });
+        }
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files && files.length) processUploadedFiles(files);
+            event.target.value = '';
+        }
+
+        async function processUploadedFiles(fileList) {
+            const defaultMode = document.getElementById('defaultAssetTypeSelect').value;
+            const rawFiles = Array.from(fileList);
+            const addedAssets = [];
+
+            const epsMap = new Map();
+            const rasterMap = new Map();
+
+            rawFiles.forEach(file => {
+                const extMatch = file.name.match(/\.([^.]+)$/);
+                const ext = extMatch ? extMatch[1].toLowerCase() : '';
+                const baseName = file.name.replace(/\.[^/.]+$/, '').toLowerCase();
+
+                if (ext === 'eps' || ext === 'ai') {
+                    epsMap.set(baseName, file);
+                } else if (['jpg', 'jpeg', 'png', 'webp', 'svg'].includes(ext)) {
+                    rasterMap.set(baseName, file);
+                }
+            });
+
+            const pairedRasterFiles = new Set();
+            for (const [baseName, epsFile] of epsMap.entries()) {
+                if (rasterMap.has(baseName)) {
+                    pairedRasterFiles.add(rasterMap.get(baseName));
+                }
+            }
+
+            for (const file of rawFiles) {
+                if (pairedRasterFiles.has(file)) continue;
+
+                const id = 'asset-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7);
+                const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|webm)$/i.test(file.name);
+                const isDirectEPS = /\.(eps|ai)$/i.test(file.name) || file.type === 'application/postscript' || file.type === 'application/eps';
+                const isVector = isDirectEPS || file.type === 'image/svg+xml' || /\.svg$/i.test(file.name);
+
+                let detectedType = 'photo';
+                if (defaultMode !== 'auto') {
+                    detectedType = defaultMode;
+                } else if (isVideo) {
+                    detectedType = 'video';
+                } else if (isVector) {
+                    detectedType = 'vector';
+                }
+
+                let previewDataUrl = '';
+                let dimensions = '';
+                let palette = { hexList: [], names: [] };
+                let isVideoGrid = false;
+                let epsExtractionMode = null;
+                let epsPostScriptContext = '';
+
+                if (isVideo) {
+                    const videoInfo = await extractVideoFrameToDataUrl(file);
+                    previewDataUrl = videoInfo.dataUrl;
+                    dimensions = videoInfo.dimensions;
+                    palette = videoInfo.palette || palette;
+                    isVideoGrid = !!videoInfo.isVideoGrid;
+                } else if (isDirectEPS) {
+                    const baseName = file.name.replace(/\.[^/.]+$/, '').toLowerCase();
+                    const companionImg = rasterMap.get(baseName);
+
+                    if (companionImg) {
+                        const imgInfo = await extractImageToDataUrl(companionImg);
+                        previewDataUrl = imgInfo.dataUrl;
+                        dimensions = `${imgInfo.dimensions} (Paired EPS)`;
+                        palette = imgInfo.palette || palette;
+                        epsExtractionMode = 'PAIRED HD (.EPS + .JPG)';
+                    } else {
+                        const epsInfo = await extractEPSToDataUrl(file);
+                        previewDataUrl = epsInfo.dataUrl;
+                        dimensions = epsInfo.dimensions;
+                        palette = epsInfo.palette || palette;
+                        epsExtractionMode = epsInfo.modeLabel;
+                        epsPostScriptContext = epsInfo.postScriptHint || '';
+                    }
+                } else {
+                    const imgInfo = await extractImageToDataUrl(file);
+                    previewDataUrl = imgInfo.dataUrl;
+                    dimensions = imgInfo.dimensions;
+                    palette = imgInfo.palette || palette;
+                }
+
+                const newAsset = {
+                    id,
+                    filename: file.name,
+                    originalFile: file,
+                    originalFileSize: file.size,
+                    dimensions,
+                    previewUrl: previewDataUrl,
+                    base64Jpeg: previewDataUrl ? previewDataUrl.split(',')[1] : null,
+                    palette,
+                    isVideoGrid,
+                    epsExtractionMode,
+                    customHint: epsPostScriptContext,
+                    layers: null,
+                    backupPool: [],
+                    stemmedRemovedCount: 0,
+                    assetType: detectedType,
+                    title: '',
+                    keywords: [],
+                    adobeCategory: isVector ? 8 : 3,
+                    shutterCategory1: isVector ? 'Arts' : 'Business/Finance',
+                    shutterCategory2: 'Technology',
+                    isAIGenerated: detectedType === 'ai',
+                    visualSummary: isDirectEPS
+                        ? `Direct Vector (${epsExtractionMode}) queued for AI Vision analysis...`
+                        : 'Queued for AI Vision pixel analysis...',
+                    releaseStatus: 'Checking release requirements...',
+                    isScanning: false
+                };
+
+                addedAssets.push(newAsset);
+            }
+
+            assets = [...addedAssets, ...assets];
+            if (addedAssets.length > 0) {
+                activeAssetId = addedAssets[0].id;
+            }
+            renderAll();
+            showToast(`Loaded ${addedAssets.length} asset(s). Starting 4-Tier AI Vision scan...`, 'info');
+
+            for (const item of addedAssets) {
+                await analyzeSingleAssetWithGemini(item);
+            }
+        }
+
+        async function extractEPSToDataUrl(file) {
+            try {
+                const buffer = await file.arrayBuffer();
+                const bytes = new Uint8Array(buffer);
+
+                const textSlice = new TextDecoder('latin1').decode(bytes.subarray(0, Math.min(bytes.length, 96000)));
+                let bboxDim = 'EPS Vector';
+                const bboxMatch = textSlice.match(/%%BoundingBox:\s*(-?\d+)\s+(-?\d+)\s+(\d+)\s+(\d+)/);
+                if (bboxMatch) {
+                    const w = Math.abs(parseInt(bboxMatch[3], 10) - parseInt(bboxMatch[1], 10));
+                    const h = Math.abs(parseInt(bboxMatch[4], 10) - parseInt(bboxMatch[2], 10));
+                    if (w > 0 && h > 0) bboxDim = `${w}×${h} pt (EPS)`;
+                }
+
+                const titleMatch = textSlice.match(/%%Title:\s*\(?([^\r\n)]+)\)?/);
+                const rawPsTitle = titleMatch ? titleMatch[1].replace(/\.(eps|ai|svg|pdf)$/i, '').replace(/[_-]+/g, ' ').trim() : '';
+
+                const embeddedJpegUrl = findEmbeddedJpegInBytes(bytes);
+                if (embeddedJpegUrl) {
+                    const rendered = await renderUrlOnto1536Canvas(embeddedJpegUrl, bboxDim);
+                    if (rendered) {
+                        return {
+                            ...rendered,
+                            modeLabel: 'EMBEDDED EPS PREVIEW',
+                            postScriptHint: rawPsTitle ? `Vector file metadata: ${rawPsTitle}` : ''
+                        };
+                    }
+                }
+
+                if (bytes.length > 30 && bytes[0] === 0xC5 && bytes[1] === 0xD0 && bytes[2] === 0xD3 && bytes[3] === 0xC6) {
+                    const view = new DataView(buffer);
+                    const tiffOffset = view.getUint32(20, true);
+                    const tiffLength = view.getUint32(24, true);
+                    if (tiffOffset > 0 && tiffLength > 0 && tiffOffset + tiffLength <= bytes.length) {
+                        const tiffBytes = bytes.subarray(tiffOffset, tiffOffset + tiffLength);
+                        const decodedTiff = decodeUncompressedTIFFToCanvas(tiffBytes);
+                        if (decodedTiff) {
+                            return {
+                                dataUrl: decodedTiff.dataUrl,
+                                dimensions: bboxDim,
+                                palette: decodedTiff.palette,
+                                modeLabel: 'EPS TIFF PREVIEW',
+                                postScriptHint: rawPsTitle ? `Vector file metadata: ${rawPsTitle}` : ''
+                            };
+                        }
+                    }
+                }
+
+                const xmpThumbMatch = textSlice.match(/<xmpGImg:image>([\s\S]*?)<\/xmpGImg:image>/);
+                if (xmpThumbMatch && xmpThumbMatch[1]) {
+                    const cleanBase64 = xmpThumbMatch[1].replace(/&#xA;|\s+/g, '');
+                    const xmpDataUrl = `data:image/jpeg;base64,${cleanBase64}`;
+                    const rendered = await renderUrlOnto1536Canvas(xmpDataUrl, bboxDim);
+                    if (rendered) {
+                        return {
+                            ...rendered,
+                            modeLabel: 'ADOBE XMP PREVIEW',
+                            postScriptHint: rawPsTitle ? `Vector file metadata: ${rawPsTitle}` : ''
+                        };
+                    }
+                }
+
+                return buildPostScriptVectorSheet(file.name, textSlice, bboxDim, rawPsTitle);
+            } catch (err) {
+                console.warn('EPS extraction fallback:', err);
+                return buildPostScriptVectorSheet(file.name, '', 'EPS Vector', '');
+            }
+        }
+
+        function findEmbeddedJpegInBytes(bytes) {
+            for (let i = 0; i < bytes.length - 4; i++) {
+                if (bytes[i] === 0xFF && bytes[i + 1] === 0xD8 && bytes[i + 2] === 0xFF && (bytes[i + 3] === 0xE0 || bytes[i + 3] === 0xE1 || bytes[i + 3] === 0xDB)) {
+                    for (let j = i + 256; j < bytes.length - 1; j++) {
+                        if (bytes[j] === 0xFF && bytes[j + 1] === 0xD9) {
+                            const jpegSlice = bytes.subarray(i, j + 2);
+                            if (jpegSlice.length > 512) {
+                                const blob = new Blob([jpegSlice], { type: 'image/jpeg' });
+                                return URL.createObjectURL(blob);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        function renderUrlOnto1536Canvas(blobOrDataUrl, bboxDim) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const maxDim = 1536;
+                    let w = img.naturalWidth || 1024;
+                    let h = img.naturalHeight || 768;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else { w = Math.round((w * maxDim) / h); h = maxDim; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const palette = extractDominantColorsFromCanvas(ctx, w, h);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.90);
+                    if (blobOrDataUrl.startsWith('blob:')) URL.revokeObjectURL(blobOrDataUrl);
+                    resolve({ dataUrl, dimensions: bboxDim, palette });
+                };
+                img.onerror = () => {
+                    if (blobOrDataUrl.startsWith('blob:')) URL.revokeObjectURL(blobOrDataUrl);
+                    resolve(null);
+                };
+                img.src = blobOrDataUrl;
+            });
+        }
+
+        function decodeUncompressedTIFFToCanvas(tiffBytes) {
+            try {
+                if (tiffBytes.length < 16) return null;
+                const littleEndian = tiffBytes[0] === 0x49 && tiffBytes[1] === 0x49;
+                const view = new DataView(tiffBytes.buffer, tiffBytes.byteOffset, tiffBytes.byteLength);
+                const magic = view.getUint16(2, littleEndian);
+                if (magic !== 42) return null;
+
+                const ifdOffset = view.getUint32(4, littleEndian);
+                if (ifdOffset + 2 > tiffBytes.length) return null;
+                const numEntries = view.getUint16(ifdOffset, littleEndian);
+
+                let width = 0, height = 0, compression = 1, stripOffset = 0, samplesPerPixel = 1;
+                for (let i = 0; i < numEntries; i++) {
+                    const entryPos = ifdOffset + 2 + i * 12;
+                    if (entryPos + 12 > tiffBytes.length) break;
+                    const tag = view.getUint16(entryPos, littleEndian);
+                    const type = view.getUint16(entryPos + 2, littleEndian);
+                    const val = type === 3 ? view.getUint16(entryPos + 8, littleEndian) : view.getUint32(entryPos + 8, littleEndian);
+
+                    if (tag === 256) width = val;
+                    else if (tag === 257) height = val;
+                    else if (tag === 259) compression = val;
+                    else if (tag === 273) stripOffset = val;
+                    else if (tag === 277) samplesPerPixel = val;
+                }
+
+                if (compression !== 1 || width <= 0 || height <= 0 || stripOffset <= 0) return null;
+                const requiredBytes = width * height * samplesPerPixel;
+                if (stripOffset + requiredBytes > tiffBytes.length) return null;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                const imgData = ctx.createImageData(width, height);
+                const dest = imgData.data;
+
+                let srcIdx = stripOffset;
+                for (let p = 0; p < width * height; p++) {
+                    const dIdx = p * 4;
+                    if (samplesPerPixel >= 3) {
+                        dest[dIdx] = tiffBytes[srcIdx];
+                        dest[dIdx + 1] = tiffBytes[srcIdx + 1];
+                        dest[dIdx + 2] = tiffBytes[srcIdx + 2];
+                        dest[dIdx + 3] = 255;
+                    } else {
+                        const g = tiffBytes[srcIdx];
+                        dest[dIdx] = g;
+                        dest[dIdx + 1] = g;
+                        dest[dIdx + 2] = g;
+                        dest[dIdx + 3] = 255;
+                    }
+                    srcIdx += samplesPerPixel;
+                }
+                ctx.putImageData(imgData, 0, 0);
+                const palette = extractDominantColorsFromCanvas(ctx, width, height);
+                return { dataUrl: canvas.toDataURL('image/jpeg', 0.90), palette };
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function buildPostScriptVectorSheet(filename, psText, bboxDim, rawPsTitle) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1200;
+            canvas.height = 900;
+            const ctx = canvas.getContext('2d');
+
+            const extractedHexColors = [];
+            const rgbRegex = /(\d*\.\d+|\d+)\s+(\d*\.\d+|\d+)\s+(\d*\.\d+|\d+)\s+(?:setrgbcolor|rg|RG)/g;
+            let match;
+            while ((match = rgbRegex.exec(psText)) !== null && extractedHexColors.length < 6) {
+                const r = Math.min(255, Math.round(parseFloat(match[1]) * 255));
+                const g = Math.min(255, Math.round(parseFloat(match[2]) * 255));
+                const b = Math.min(255, Math.round(parseFloat(match[3]) * 255));
+                const hex = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+                if (!extractedHexColors.includes(hex)) extractedHexColors.push(hex);
+            }
+
+            if (extractedHexColors.length === 0) {
+                extractedHexColors.push('#6366f1', '#10b981', '#0ea5e9', '#f59e0b');
+            }
+
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, 1200, 900);
+
+            extractedHexColors.forEach((hex, idx) => {
+                ctx.fillStyle = hex;
+                ctx.beginPath();
+                ctx.arc(280 + idx * 140, 420, 95, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = 'bold 34px Inter, sans-serif';
+            ctx.fillText('DIRECT .EPS POSTSCRIPT VECTOR', 180, 200);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '24px monospace';
+            ctx.fillText(`File: ${filename} (${bboxDim})`, 180, 255);
+            if (rawPsTitle) {
+                ctx.fillStyle = '#38bdf8';
+                ctx.fillText(`Embedded Title: ${rawPsTitle.slice(0, 45)}`, 180, 620);
+            }
+
+            const palette = extractDominantColorsFromCanvas(ctx, 1200, 900);
+            return {
+                dataUrl: canvas.toDataURL('image/jpeg', 0.90),
+                dimensions: bboxDim,
+                palette,
+                modeLabel: 'POSTSCRIPT VECTOR DATA',
+                postScriptHint: rawPsTitle || filename.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ')
+            };
+        }
+
+        function triggerAttachEPSPreview() {
+            const input = document.getElementById('epsPreviewAttachInput');
+            if (input) input.click();
+        }
+
+        async function handleAttachEPSPreview(event) {
+            const file = event.target.files?.[0];
+            event.target.value = '';
+            const asset = getActiveAsset();
+            if (!file || !asset) return;
+
+            const imgInfo = await extractImageToDataUrl(file);
+            asset.previewUrl = imgInfo.dataUrl;
+            asset.base64Jpeg = imgInfo.dataUrl ? imgInfo.dataUrl.split(',')[1] : null;
+            asset.palette = imgInfo.palette;
+            asset.epsExtractionMode = 'PAIRED HD PREVIEW';
+            renderAll();
+            showToast(`Attached 1536px HD preview to ${asset.filename}! Running AI Vision...`, 'success');
+            await analyzeSingleAssetWithGemini(asset);
+        }
+
+        function extractImageToDataUrl(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const maxDim = 1536;
+                        let w = img.naturalWidth || 1200;
+                        let h = img.naturalHeight || 800;
+                        if (w > maxDim || h > maxDim) {
+                            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, w, h);
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const palette = extractDominantColorsFromCanvas(ctx, w, h);
+                        const jpegUrl = canvas.toDataURL('image/jpeg', 0.90);
+                        resolve({
+                            dataUrl: jpegUrl,
+                            dimensions: `${img.naturalWidth || w}×${img.naturalHeight || h}`,
+                            palette
+                        });
+                    };
+                    img.onerror = () => resolve({ dataUrl: e.target.result, dimensions: 'Vector/Image', palette: { hexList: [], names: [] } });
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function extractDominantColorsFromCanvas(ctx, w, h) {
+            try {
+                const sampleSize = 64;
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = sampleSize;
+                tempCanvas.height = sampleSize;
+                const tCtx = tempCanvas.getContext('2d');
+                tCtx.drawImage(ctx.canvas, 0, 0, w, h, 0, 0, sampleSize, sampleSize);
+                const data = tCtx.getImageData(0, 0, sampleSize, sampleSize).data;
+
+                const buckets = new Map();
+                for (let i = 0; i < data.length; i += 16) {
+                    const r = Math.round(data[i] / 32) * 32;
+                    const g = Math.round(data[i + 1] / 32) * 32;
+                    const b = Math.round(data[i + 2] / 32) * 32;
+                    const key = `${r},${g},${b}`;
+                    buckets.set(key, (buckets.get(key) || 0) + 1);
+                }
+
+                const sorted = [...buckets.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4);
+                const hexList = [];
+                const namesSet = new Set();
+
+                sorted.forEach(([rgbStr]) => {
+                    const [r, g, b] = rgbStr.split(',').map(Number);
+                    const hex = '#' + [r, g, b].map(x => Math.min(255, x).toString(16).padStart(2, '0')).join('');
+                    hexList.push(hex);
+                    namesSet.add(classifyColorName(r, g, b));
+                });
+
+                return { hexList, names: [...namesSet] };
+            } catch (e) {
+                return { hexList: [], names: [] };
+            }
+        }
+
+        function classifyColorName(r, g, b) {
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const l = (max + min) / 2;
+            if (l > 230) return 'white';
+            if (l < 35) return 'black';
+            if (max - min < 25) return l > 130 ? 'silver' : 'gray';
+            if (r >= g && r >= b) {
+                if (g > 150 && b < 80) return 'yellow';
+                if (g > 85) return 'orange';
+                return b > 120 ? 'pink' : 'red';
+            }
+            if (g >= r && g >= b) {
+                return b > 140 ? 'teal' : 'green';
+            }
+            return r > 120 ? 'purple' : 'blue';
+        }
+
+        async function downloadMetadataEmbeddedJPG(targetAsset = null) {
+            const asset = targetAsset || getActiveAsset();
+            if (!asset || !asset.previewUrl) {
+                showToast('Please select an asset first.', 'warn');
+                return;
+            }
+            if (!asset.title || asset.keywords.length === 0) {
+                showToast('Run Deep Scan first so Title & 45 Keywords are ready to embed!', 'warn');
+                return;
+            }
+
+            try {
+                let rawBytes = null;
+                let usedOriginalBinary = false;
+
+                if (asset.originalFile) {
+                    const origBuffer = await asset.originalFile.arrayBuffer();
+                    const candidateBytes = new Uint8Array(origBuffer);
+                    if (candidateBytes.length > 4 && candidateBytes[0] === 0xFF && candidateBytes[1] === 0xD8) {
+                        rawBytes = candidateBytes;
+                        usedOriginalBinary = true;
+                    }
+                }
+
+                if (!rawBytes) {
+                    if (asset.originalFile && asset.originalFile.type.startsWith('image/') && !/\.(eps|ai)$/i.test(asset.originalFile.name)) {
+                        rawBytes = await renderFullResolutionJpegBytes(asset.originalFile);
+                    } else {
+                        const base64Data = asset.previewUrl.split(',')[1];
+                        const binaryStr = atob(base64Data);
+                        rawBytes = new Uint8Array(binaryStr.length);
+                        for (let i = 0; i < binaryStr.length; i++) {
+                            rawBytes[i] = binaryStr.charCodeAt(i);
+                        }
+                    }
+                }
+
+                if (!rawBytes || rawBytes[0] !== 0xFF || rawBytes[1] !== 0xD8) {
+                    showToast('Direct XMP embedding requires a valid image.', 'warn');
+                    return;
+                }
+
+                const origBytes = stripExistingXmpFromJpeg(rawBytes);
+
+                const cleanTitle = escapeXml(asset.title);
+                const kwBagItems = asset.keywords.map(k => `<rdf:li>${escapeXml(k)}</rdf:li>`).join('');
+                const xmpXml = `<?xpacket begin="\uFEFF" id="W5M0MpCehiHzreSzNTczkc9d"?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/">
+ <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about=""
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:photoshop="http://ns.adobe.com/photoshop/1.0/">
+   <photoshop:Headline>${cleanTitle}</photoshop:Headline>
+   <dc:title><rdf:Alt><rdf:li xml:lang="x-default">${cleanTitle}</rdf:li></rdf:Alt></dc:title>
+   <dc:description><rdf:Alt><rdf:li xml:lang="x-default">${cleanTitle}</rdf:li></rdf:Alt></dc:description>
+   <dc:subject><rdf:Bag>${kwBagItems}</rdf:Bag></dc:subject>
+  </rdf:Description>
+ </rdf:RDF>
+</x:xmpmeta>
+<?xpacket end="w"?>`;
+
+                const encoder = new TextEncoder();
+                const headerBytes = encoder.encode('http://ns.adobe.com/xap/1.0/\0');
+                const xmlBytes = encoder.encode(xmpXml);
+                const app1Length = 2 + headerBytes.length + xmlBytes.length;
+
+                const app1Segment = new Uint8Array(2 + app1Length);
+                app1Segment[0] = 0xFF;
+                app1Segment[1] = 0xE1;
+                app1Segment[2] = (app1Length >> 8) & 0xFF;
+                app1Segment[3] = app1Length & 0xFF;
+                app1Segment.set(headerBytes, 4);
+                app1Segment.set(xmlBytes, 4 + headerBytes.length);
+
+                const combined = new Uint8Array(origBytes.length + app1Segment.length);
+                combined.set(origBytes.subarray(0, 2), 0);
+                combined.set(app1Segment, 2);
+                combined.set(origBytes.subarray(2), 2 + app1Segment.length);
+
+                const blob = new Blob([combined], { type: 'image/jpeg' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const outName = asset.filename.replace(/\.[^/.]+$/, '') + '.jpg';
+                a.href = url;
+                a.download = outName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                const modeMsg = usedOriginalBinary ? '100% Lossless Original Resolution' : 'Full Resolution';
+                showToast(`Embedded Title & ${asset.keywords.length} Keywords (${modeMsg}) into ${outName}!`, 'success');
+            } catch (err) {
+                console.error('XMP Embed Error:', err);
+                showToast('Failed to embed XMP packet.', 'warn');
+            }
+        }
+
+        function renderFullResolutionJpegBytes(file) {
+            return new Promise((resolve) => {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(url);
+                    canvas.toBlob(async (blob) => {
+                        if (!blob) { resolve(null); return; }
+                        const buf = await blob.arrayBuffer();
+                        resolve(new Uint8Array(buf));
+                    }, 'image/jpeg', 1.0);
+                };
+                img.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    resolve(null);
+                };
+                img.src = url;
+            });
+        }
+
+        function extractVideoFrameToDataUrl(file) {
+            return new Promise((resolve) => {
+                const url = URL.createObjectURL(file);
+                const video = document.createElement('video');
+                video.preload = 'auto';
+                video.muted = true;
+                video.playsInline = true;
+
+                const timeFractions = [0.10, 0.35, 0.60, 0.85];
+                let stepIndex = 0;
+                let gridCanvas, gridCtx, cellW, cellH, origW, origH;
+
+                video.onloadedmetadata = () => {
+                    origW = video.videoWidth || 1920;
+                    origH = video.videoHeight || 1080;
+                    const totalGridWidth = 1536;
+                    cellW = Math.floor(totalGridWidth / 2);
+                    cellH = Math.floor((origH / origW) * cellW);
+
+                    gridCanvas = document.createElement('canvas');
+                    gridCanvas.width = cellW * 2;
+                    gridCanvas.height = cellH * 2;
+                    gridCtx = gridCanvas.getContext('2d');
+                    gridCtx.fillStyle = '#070b14';
+                    gridCtx.fillRect(0, 0, gridCanvas.width, gridCanvas.height);
+
+                    const duration = Math.max(1, video.duration || 4);
+                    video.currentTime = Math.min(duration - 0.1, duration * timeFractions[0]);
+                };
+
+                video.onseeked = () => {
+                    const col = stepIndex % 2;
+                    const row = Math.floor(stepIndex / 2);
+                    const x = col * cellW;
+                    const y = row * cellH;
+
+                    gridCtx.drawImage(video, x, y, cellW, cellH);
+
+                    gridCtx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+                    gridCtx.fillRect(x + 8, y + 8, 125, 24);
+                    gridCtx.fillStyle = '#38bdf8';
+                    gridCtx.font = 'bold 13px monospace';
+                    gridCtx.fillText(`FRAME ${stepIndex + 1} (${Math.round(timeFractions[stepIndex] * 100)}%)`, x + 14, y + 24);
+
+                    stepIndex++;
+                    const duration = Math.max(1, video.duration || 4);
+                    if (stepIndex < timeFractions.length) {
+                        video.currentTime = Math.min(duration - 0.05, duration * timeFractions[stepIndex]);
+                    } else {
+                        const palette = extractDominantColorsFromCanvas(gridCtx, gridCanvas.width, gridCanvas.height);
+                        const dataUrl = gridCanvas.toDataURL('image/jpeg', 0.90);
+                        URL.revokeObjectURL(url);
+                        resolve({
+                            dataUrl,
+                            dimensions: `${origW}×${origH} (4-Frame Video)`,
+                            palette,
+                            isVideoGrid: true
+                        });
+                    }
+                };
+
+                video.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    resolve({ dataUrl: '', dimensions: 'MP4 Video', palette: { hexList: [], names: [] }, isVideoGrid: false });
+                };
+
+                video.src = url;
+            });
+        }
+
+        async function loadSampleTestAssets() {
+            showToast('Loading 3 high-res blind-named assets (IMG_0001.jpg, DSC_9942.jpg, ART_09.jpg)...', 'info');
+            const samples = [
+                {
+                    filename: 'IMG_0001.jpg',
+                    assetType: 'photo',
+                    url: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1600&q=90'
+                },
+                {
+                    filename: 'DSC_9942.jpg',
+                    assetType: 'photo',
+                    url: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1600&q=90'
+                },
+                {
+                    filename: 'ART_UNTITLED_09.jpg',
+                    assetType: 'ai',
+                    url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=90'
+                }
+            ];
+
+            const loaded = [];
+            for (const s of samples) {
+                const base64Info = await fetchRemoteImageAsBase64(s.url);
+                loaded.push({
+                    id: 'sample-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                    filename: s.filename,
+                    dimensions: base64Info.dimensions,
+                    previewUrl: base64Info.dataUrl,
+                    base64Jpeg: base64Info.base64,
+                    palette: base64Info.palette || { hexList: ['#0284c7', '#f59e0b'], names: ['blue', 'orange'] },
+                    isVideoGrid: false,
+                    customHint: '',
+                    layers: null,
+                    backupPool: [],
+                    stemmedRemovedCount: 0,
+                    assetType: s.assetType,
+                    title: '',
+                    keywords: [],
+                    adobeCategory: 3,
+                    shutterCategory1: 'Business/Finance',
+                    shutterCategory2: 'Technology',
+                    isAIGenerated: s.assetType === 'ai',
+                    visualSummary: 'Click "Deep Scan 1536px" or wait for auto-analysis...',
+                    isScanning: false
+                });
+            }
+
+            assets = [...loaded, ...assets];
+            activeAssetId = loaded[0].id;
+            renderAll();
+
+            await analyzeSingleAssetWithGemini(loaded[0]);
+        }
+
+        function fetchRemoteImageAsBase64(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 1536;
+                    let w = img.naturalWidth || 1200;
+                    let h = img.naturalHeight || 800;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else { w = Math.round((w * maxDim) / h); h = maxDim; }
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const palette = extractDominantColorsFromCanvas(ctx, w, h);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.90);
+                    resolve({
+                        dataUrl,
+                        base64: dataUrl.split(',')[1],
+                        dimensions: `${img.naturalWidth}×${img.naturalHeight}`,
+                        palette
+                    });
+                };
+                img.onerror = () => resolve({ dataUrl: url, base64: null, dimensions: '1920×1080', palette: { hexList: [], names: [] } });
+                img.src = url;
+            });
+        }
+
+        function getCanonicalStem(phrase) {
+            const words = String(phrase).toLowerCase().trim().split(/\s+/);
+            const stemmedWords = words.map(w => {
+                if (IRREGULAR_PLURALS[w]) return IRREGULAR_PLURALS[w];
+                if (w.length <= 3) return w;
+                if (w.endsWith('ies') && w.length > 4) return w.slice(0, -3) + 'y';
+                if (w.endsWith('ves') && w.length > 4) return w.slice(0, -3) + 'f';
+                if (w.endsWith('es') && (w.endsWith('ches') || w.endsWith('shes') || w.endsWith('xes') || w.endsWith('zes') || w.endsWith('sses'))) {
+                    return w.slice(0, -2);
+                }
+                if (w.endsWith('s') && !w.endsWith('ss') && !w.endsWith('us') && !w.endsWith('is') && !w.endsWith('os') && !w.endsWith('as') && !w.endsWith('ns')) {
+                    return w.slice(0, -1);
+                }
+                return w;
+            });
+            return stemmedWords.join(' ');
+        }
+
+        function extractVisualTermsFromLayers(title = '', layers = null, colorNames = []) {
+            const stopWords = new Set(['with', 'from', 'that', 'this', 'into', 'over', 'under', 'between', 'through', 'during', 'before', 'after', 'above', 'below', 'for', 'and', 'the', 'in', 'on', 'at', 'to', 'of', 'by', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'but', 'if', 'or', 'because', 'until', 'while', 'about', 'against']);
+            const rawText = [
+                title,
+                layers?.literal || '',
+                layers?.subject || '',
+                layers?.commercial || '',
+                layers?.technical || '',
+                ...(colorNames || [])
+            ].join(' ').toLowerCase();
+
+            return rawText
+                .replace(/[^a-z0-9\s-]/g, ' ')
+                .split(/\s+/)
+                .map(w => w.trim().replace(/^-+|-+$/g, ''))
+                .filter(w => w.length >= 3 && !stopWords.has(w) && !isBannedTerm(w));
+        }
+
+        function deduplicateAndGuaranteeKeywords(rawKeywords, backupKeywords, targetCount, assetType, colorNames = [], title = '', layers = null) {
+            const visualDerivedPool = extractVisualTermsFromLayers(title, layers, colorNames);
+            const combinedCandidates = [...(rawKeywords || []), ...(backupKeywords || []), ...visualDerivedPool];
+            const seenExact = new Set();
+            const seenStems = new Set();
+            const accepted = [];
+            const overflowPool = [];
+            let stemmedSkipped = 0;
+
+            for (const raw of combinedCandidates) {
+                const norm = String(raw)
+                    .toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/^-+|-+$/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                if (!norm || norm.length < 2 || isBannedTerm(norm)) continue;
+                if (norm.split(/\s+/).length > 3) continue;
+                if (seenExact.has(norm)) continue;
+
+                const stem = getCanonicalStem(norm);
+                if (seenStems.has(stem)) {
+                    stemmedSkipped++;
+                    continue;
+                }
+
+                seenExact.add(norm);
+                seenStems.add(stem);
+
+                if (accepted.length < targetCount) {
+                    accepted.push(norm);
+                } else {
+                    overflowPool.push(norm);
+                }
+            }
+
+            const strictFormatFallbacks = {
+                photo: [...colorNames, 'photography', 'commercial', 'image', 'horizontal', 'composition', 'detail', 'background', 'concept', 'modern', 'professional', 'visual', 'high quality'],
+                vector: [...colorNames, 'vector', 'illustration', 'graphic', 'design', 'artwork', 'element', 'symbol', 'creative', 'modern', 'digital', 'flat', 'commercial'],
+                ai: [...colorNames, 'generative', 'digital art', 'conceptual', 'illustration', 'creative', 'modern', 'visual', 'design', 'artistic', 'composition', 'commercial'],
+                video: [...colorNames, 'footage', 'video', 'clip', 'motion', 'scene', 'sequence', 'movement', 'commercial', 'visual', 'horizontal', 'dynamic', 'production']
+            }[assetType || 'photo'];
+
+            for (const fallbackTag of strictFormatFallbacks) {
+                if (accepted.length >= targetCount) break;
+                const norm = String(fallbackTag).toLowerCase().trim();
+                const stem = getCanonicalStem(norm);
+                if (norm && !seenExact.has(norm) && !seenStems.has(stem) && !isBannedTerm(norm)) {
+                    seenExact.add(norm);
+                    seenStems.add(stem);
+                    accepted.push(norm);
+                }
+            }
+
+            return {
+                finalKeywords: accepted.slice(0, targetCount),
+                backupPool: overflowPool,
+                stemmedSkipped
+            };
+        }
+
+        async function fetchWithRetry(url, options, maxRetries = 4) {
+            let delay = 1000;
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) return response;
+                    if (response.status !== 429 && response.status < 500) {
+                        return response;
+                    }
+                } catch (err) {
+                    if (attempt === maxRetries - 1) throw err;
+                }
+                await new Promise(r => setTimeout(r, delay));
+                delay *= 2;
+            }
+            throw new Error('API request failed after retries');
+        }
+
+        async function analyzeCurrentWithAIVision() {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            await analyzeSingleAssetWithGemini(asset);
+        }
+
+        async function analyzeAllWithAIVision() {
+            if (!assets.length) return;
+            const progBox = document.getElementById('batchProgressContainer');
+            const progBar = document.getElementById('batchProgressBar');
+            const progPct = document.getElementById('batchProgressPercent');
+            progBox.classList.remove('hidden');
+
+            for (let i = 0; i < assets.length; i++) {
+                progPct.textContent = `${i + 1}/${assets.length}`;
+                progBar.style.width = `${Math.round(((i + 1) / assets.length) * 100)}%`;
+                activeAssetId = assets[i].id;
+                renderAll();
+                await analyzeSingleAssetWithGemini(assets[i]);
+            }
+
+            setTimeout(() => progBox.classList.add('hidden'), 1200);
+            showToast(`Completed 100% Real AI Vision analysis for all ${assets.length} assets!`, 'success');
+        }
+
+        async function analyzeSingleAssetWithGemini(asset) {
+            if (!asset || asset.isScanning) return;
+            asset.isScanning = true;
+            asset.visualSummary = 'Running 4-Tier Visual SEO Breakdown on 1536px pixels...';
+            
+            const btn = document.getElementById('aiGenerateBtn');
+            const scanner = document.getElementById('scannerOverlay');
+            if (btn && activeAssetId === asset.id) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> <span>4-Tier SEO Scanning...</span>`;
+            }
+            if (scanner && activeAssetId === asset.id) {
+                scanner.classList.remove('hidden');
+            }
+            renderQueueList();
+
+            try {
+                if (!asset.base64Jpeg && asset.previewUrl) {
+                    const fetched = await fetchRemoteImageAsBase64(asset.previewUrl);
+                    asset.base64Jpeg = fetched.base64;
+                    asset.palette = fetched.palette;
+                }
+
+                const targetKwCount = parseInt(document.getElementById('targetKwCountInput')?.value || '45', 10);
+                const kwStyle = document.getElementById('kwStyleSelect')?.value || 'hybrid';
+                const colorHint = (asset.palette?.names || []).join(', ') || 'balanced tones';
+                const contributorHint = (asset.customHint || '').trim();
+                updateSelectedModelVariable();
+
+                const mediaTypeContext = {
+                    photo: 'Commercial Stock Photograph (1536px HD). Pay close attention to micro-details, ethnicity/age/expression ONLY if people are visibly present (or explicitly note "nobody" ONLY if zero people/body parts exist), actual lighting, actual camera angle, and copy space.',
+                    vector: 'Vector Illustration / Graphic Resource (EPS/SVG). Pay close attention to exact illustration style (e.g., flat design, isometric, line art, icon set, infographic, seamless pattern, isolated element) and commercial usability.',
+                    ai: 'Generative AI Commercial Concept Art. Focus on exact visible subjects, conceptual visual metaphors, lighting, and commercial advertising usability.',
+                    video: 'Stock Video Footage represented as a 2x2 Storyboard Grid of 4 sequential frames (10%, 35%, 60%, 85%). Compare Frame 1 to Frame 4 to detect true subject motion, action progression, and camera movement.'
+                }[asset.assetType] || 'Commercial Stock Asset';
+
+                const systemInstruction = `You are the Principal Adobe Stock, Shutterstock & Freepik Search Algorithm Architect.
+YOUR #1 MANDATE: 100% VISUAL TRUTH, ZERO HALLUCINATION & MAXIMUM BUYER CONVERSION.
+- NEVER invent, guess, or hallucinate any object, person, emotion, setting, or lighting that is not 100% visible in the image pixels.
+- NEVER use filename text unless the contributor explicitly wrote a hint.
+- NEVER use poetic/AI fluff words ("stunning", "breathtaking", "mesmerizing", "masterpiece", "beautiful", "very", "amazing", "hyperrealistic").
+
+4-TIER STOCK AGENCY #1 RANKING ARCHITECTURE (STRICT COMPLIANCE):
+1. BUYER-SEARCHABLE TITLE (70 to 150 characters, 10 to 22 words):
+   - Structure: [Exact Literal Main Subject] + [Visible Action/State] + [Exact Setting/Background] + [Commercial Purpose/Composition, e.g., copy space, isolated on white, close up].
+   - Write in natural, factual commercial English. Do not use colons, semicolons, or quotes.
+
+2. TIER 1 — KEYWORDS #1 TO #10 (THE GOLDEN SEO CORE):
+   - Adobe Stock & Shutterstock weight Keywords #1 to #10 highest. Every core noun from your Title MUST appear within the first 7 keywords.
+   - Keyword #1 MUST be the exact primary literal subject.
+   - Keywords #2 to #7 MUST be the literal subject, action, and setting words directly matching your Title.
+   - Keywords #8 to #10 MUST be the primary commercial industry or category concept.
+
+3. TIER 2 — KEYWORDS #11 TO #25 (HIGH-DEMAND BUYER CONCEPTS & MOOD):
+   - Include high-search-volume commercial concepts, themes, and buyer use-cases ONLY if 100% visually applicable to this image (e.g., sustainability, renewable energy, innovation, teamwork, cybersecurity, wellness, healthy eating, luxury, minimalism, celebration, financial growth).
+
+4. TIER 3 — KEYWORDS #26 TO #38 (SPECIFIC VISUAL MICRO-DETAILS & ENVIRONMENT):
+   - Include specific visible secondary objects, textures, materials, clothing details, weather, time of day, or natural elements visibly present in the frame.
+   - If zero people or body parts are visible, include "nobody". If a person/hand is visible, NEVER include "nobody".
+
+5. TIER 4 — KEYWORDS #39 TO #70 (TECHNICAL COMPOSITION & SYNONYM BACKUP POOL):
+   - Include exact camera angle, lighting, and layout descriptors (e.g., copy space, selective focus, aerial view, flat lay, close up, top view, side view, studio shot, bokeh, silhouette, isometric, line art) ONLY if visually true.
+   - Provide 50 primary keywords in 'keywords' and 20 additional image-specific synonyms in 'backupKeywords' (70 total) so our stemmer locks in an exact ${targetKwCount} 100% accurate keywords.
+   - ANTI-SPAM RULE: Never output both singular and plural forms of a word. Always prefer singular nouns.
+   - Format preference: ${kwStyle === 'single' ? 'Strictly single words only' : '80% high-volume single words + 20% high-converting 2-word buyer phrases'}.
+
+6. OFFICIAL AGENCY CATEGORIES:
+   - Adobe Stock Category ID (1 to 21): 1:Animals, 2:Buildings/Architecture, 3:Business, 4:Drinks, 5:Environment, 6:States of Mind, 7:Food, 8:Graphic Resources, 9:Hobbies/Leisure, 10:Industry, 11:Landscapes, 12:Lifestyle, 13:People, 14:Plants/Flowers, 15:Culture/Religion, 16:Science, 17:Social Issues, 18:Sports, 19:Technology, 20:Transport, 21:Travel.
+   - Shutterstock Primary & Secondary Categories from: Abstract, Animals/Wildlife, Arts, Backgrounds/Textures, Beauty/Fashion, Buildings/Landmarks, Business/Finance, Celebrities, Education, Food and Drink, Healthcare/Medical, Holidays, Industrial, Interiors, Miscellaneous, Nature, Objects, Parks/Outdoor, People, Religion, Science, Signs/Symbols, Sports/Recreation, Technology, Transportation, Vintage.`;
+
+                const userPrompt = `Carefully inspect the pixels of this ${mediaTypeContext}.
+Dominant Canvas Colors Measured: ${colorHint}.
+${contributorHint ? `MANDATORY CONTRIBUTOR CONTEXT HINT: "${contributorHint}" (Ensure this exact factual context is integrated into the Title and Top 5 Keywords).` : ''}
+Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title (70-150 chars), 50 priority-ranked keywords following the 4-Tier SEO Hierarchy, 20 image-specific backup keywords, and the exact official Category IDs.`;
+
+                const apiKey = userCustomApiKey || "";
+                const activeModel = userCustomApiKey ? selectedGeminiModel : 'gemini-3-flash-preview';
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{
+                        role: "user",
+                        parts: [
+                            { text: userPrompt },
+                            ...(asset.base64Jpeg ? [{
+                                inlineData: {
+                                    mimeType: "image/jpeg",
+                                    data: asset.base64Jpeg
+                                }
+                            }] : [])
+                        ]
+                    }],
+                    systemInstruction: {
+                        parts: [{ text: systemInstruction }]
+                    },
+                    generationConfig: {
+                        temperature: 0.15,
+                        topP: 0.85,
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                visualSummary: { type: "STRING" },
+                                layerLiteralObjects: { type: "STRING" },
+                                layerSubjectDetails: { type: "STRING" },
+                                layerCommercialUseCase: { type: "STRING" },
+                                layerTechnicalComposition: { type: "STRING" },
+                                title: { type: "STRING" },
+                                keywords: {
+                                    type: "ARRAY",
+                                    items: { type: "STRING" }
+                                },
+                                backupKeywords: {
+                                    type: "ARRAY",
+                                    items: { type: "STRING" }
+                                },
+                                adobeCategory: { type: "INTEGER" },
+                                shutterCategory1: { type: "STRING" },
+                                shutterCategory2: { type: "STRING" },
+                                releaseRequirement: { type: "STRING" }
+                            },
+                            propertyOrdering: [
+                                "visualSummary",
+                                "layerLiteralObjects",
+                                "layerSubjectDetails",
+                                "layerCommercialUseCase",
+                                "layerTechnicalComposition",
+                                "title",
+                                "keywords",
+                                "backupKeywords",
+                                "adobeCategory",
+                                "shutterCategory1",
+                                "shutterCategory2",
+                                "releaseRequirement"
+                            ]
+                        }
+                    }
+                };
+
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`API HTTP ${response.status}: ${errText}`);
+                }
+
+                const result = await response.json();
+                let rawJson = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!rawJson) throw new Error('Empty response from Gemini Vision API');
+
+                rawJson = rawJson.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/, '').trim();
+                const parsed = JSON.parse(rawJson);
+
+                if (parsed.title) {
+                    asset.title = sanitizeTextForStock(parsed.title).slice(0, 195);
+                }
+
+                asset.layers = {
+                    literal: parsed.layerLiteralObjects || 'Detected',
+                    subject: parsed.layerSubjectDetails || 'Analyzed',
+                    commercial: parsed.layerCommercialUseCase || 'Commercial Ready',
+                    technical: parsed.layerTechnicalComposition || 'Standard Composition',
+                    colors: colorHint
+                };
+
+                const guaranteed = deduplicateAndGuaranteeKeywords(
+                    parsed.keywords || [],
+                    parsed.backupKeywords || [],
+                    targetKwCount,
+                    asset.assetType,
+                    asset.palette?.names || [],
+                    asset.title,
+                    asset.layers
+                );
+
+                asset.keywords = guaranteed.finalKeywords;
+                asset.backupPool = guaranteed.backupPool;
+                asset.stemmedRemovedCount = guaranteed.stemmedSkipped;
+
+                if (parsed.adobeCategory >= 1 && parsed.adobeCategory <= 21) {
+                    asset.adobeCategory = parsed.adobeCategory;
+                }
+                if (SHUTTERSTOCK_CATEGORIES.includes(parsed.shutterCategory1)) {
+                    asset.shutterCategory1 = parsed.shutterCategory1;
+                }
+                if (SHUTTERSTOCK_CATEGORIES.includes(parsed.shutterCategory2)) {
+                    asset.shutterCategory2 = parsed.shutterCategory2;
+                }
+                if (parsed.visualSummary) {
+                    asset.visualSummary = `AI Vision (${asset.isVideoGrid ? '4-Frame Video Grid' : '1536px HD'}): ${parsed.visualSummary}`;
+                }
+                if (parsed.releaseRequirement) {
+                    asset.releaseStatus = parsed.releaseRequirement;
+                }
+
+                showToast(`100% Pure Scan Complete: Locked exact ${asset.keywords.length} high-ranking tags!`, 'success');
+            } catch (err) {
+                console.error('AI Vision Error:', err);
+                if (!userCustomApiKey) {
+                    asset.visualSummary = 'Standalone Browser Mode Detected: Click "Engine & API Settings" to paste your free Gemini API Key.';
+                    showToast('Running outside Canvas Preview? Paste your Gemini API Key in Settings!', 'warn');
+                    openModal('apiModal');
+                } else {
+                    asset.visualSummary = 'AI Vision encountered an error. Check your API key or model selection and retry.';
+                    showToast('AI Vision request failed. Check API Key / Model settings.', 'warn');
+                }
+            } finally {
+                asset.isScanning = false;
+                if (btn && activeAssetId === asset.id) {
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="ph-bold ph-eye"></i> <span>Deep Scan 1536px (Exact 45 Tags)</span>`;
+                }
+                if (scanner && activeAssetId === asset.id) {
+                    scanner.classList.add('hidden');
+                }
+                renderAll();
+            }
+        }
+
+        function isBannedTerm(word) {
+            const clean = String(word || '').toLowerCase().trim();
+            return BANNED_TERMS.some(b => {
+                const escaped = b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(?:^|[^a-z0-9])${escaped}(?:$|[^a-z0-9])`, 'i');
+                return regex.test(clean);
+            });
+        }
+
+        function sanitizeTextForStock(text) {
+            let clean = String(text || '').replace(/["';<>:]/g, ' ').trim();
+            BANNED_TERMS.forEach(term => {
+                const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(?:^|\\s)${escaped}(?=\\s|$|[.,!?])`, 'gi');
+                clean = clean.replace(regex, ' ');
+            });
+            return clean.replace(/\s+/g, ' ').replace(/\.$/, '').trim();
+        }
+
+        function validateAsset(asset) {
+            if (!asset) return { score: 0, isReady: false, checks: [] };
+
+            const titleLen = asset.title.trim().length;
+            const titleWords = asset.title.trim().split(/\s+/).filter(Boolean).length;
+            const kwCount = asset.keywords.length;
+            const targetKw = parseInt(document.getElementById('targetKwCountInput')?.value || '45', 10);
+
+            const combinedText = (asset.title + ' ' + asset.keywords.join(' ')).toLowerCase();
+            const foundBanned = BANNED_TERMS.filter(term => isBannedTerm(combinedText) && combinedText.includes(term));
+
+            const seen = new Set();
+            const duplicates = [];
+            asset.keywords.forEach(k => {
+                const low = k.toLowerCase().trim();
+                const stem = getCanonicalStem(low);
+                if (seen.has(low) || seen.has(stem)) duplicates.push(k);
+                seen.add(low);
+                seen.add(stem);
+            });
+
+            const top10Stems = new Set(asset.keywords.slice(0, 10).flatMap(k => k.split(/\s+/)).map(w => getCanonicalStem(w)));
+            const titleCoreWords = asset.title.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 3);
+            const matchedTitleWords = titleCoreWords.filter(w => top10Stems.has(getCanonicalStem(w)));
+            const hasTop10Sync = matchedTitleWords.length >= 2 || kwCount === 0;
+
+            let maxKw = currentPlatform === 'adobe' ? 49 : 50;
+            let maxTitle = currentPlatform === 'freepik' ? 150 : 200;
+
+            const checks = [
+                {
+                    label: `Adobe SEO Title (${titleLen}/${maxTitle} chars, ${titleWords} words)`,
+                    passed: titleLen >= 50 && titleLen <= maxTitle && titleWords >= 7,
+                    hint: titleLen === 0 ? 'Click Deep Scan 1536px with AI' : (titleLen < 50 ? 'Expand title to 50–150 chars for best SEO' : 'Optimal 70–150 char Adobe Stock commercial title')
+                },
+                {
+                    label: `Exact Keyword Target & Top-10 Title Sync (${kwCount}/${targetKw})`,
+                    passed: kwCount >= 35 && kwCount <= maxKw && hasTop10Sync,
+                    hint: kwCount === 0 ? 'Waiting for AI Vision scan' : (!hasTop10Sync ? 'Ensure main title nouns are in Top 10 tags' : `${kwCount} pure visual tags • Top 10 synced with Title`)
+                },
+                {
+                    label: `Zero-Hallucination & Trademark Filter`,
+                    passed: foundBanned.length === 0 && kwCount > 0,
+                    hint: foundBanned.length > 0 ? `Remove banned/fluff term: "${foundBanned[0]}"` : '100% free of trademarks, camera specs & AI fluff'
+                },
+                {
+                    label: `Smart Anti-Spam Stemmer & Category`,
+                    passed: duplicates.length === 0 && asset.filename.includes('.') && kwCount > 0,
+                    hint: duplicates.length > 0 ? `Singular/plural duplicate: "${duplicates[0]}"` : `0 plural spam • Adobe Cat #${asset.adobeCategory} (${asset.shutterCategory1})`
+                }
+            ];
+
+            const passedCount = checks.filter(c => c.passed).length;
+            const score = Math.round((passedCount / checks.length) * 100);
+            return { score, isReady: score === 100, checks };
+        }
+
+        function renderAll() {
+            renderQueueList();
+            renderInspector();
+        }
+
+        function renderQueueList() {
+            const listEl = document.getElementById('assetList');
+            document.getElementById('assetCountBadge').textContent = assets.length;
+            document.getElementById('statTotal').textContent = assets.length;
+
+            let readyCount = 0;
+            assets.forEach(a => { if (validateAsset(a).isReady) readyCount++; });
+            document.getElementById('statReady').textContent = readyCount;
+            document.getElementById('statIncomplete').textContent = assets.length - readyCount;
+
+            if (assets.length === 0) {
+                listEl.innerHTML = `<div class="text-center py-8 text-xs text-slate-500">No files in queue. Drop photos, vectors, or videos above!</div>`;
+                return;
+            }
+
+            listEl.innerHTML = assets.map(asset => {
+                const isSelected = asset.id === activeAssetId;
+                const val = validateAsset(asset);
+                let statusBadge = '';
+                if (asset.isScanning) {
+                    statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1"><i class="ph ph-spinner animate-spin"></i> AI</span>`;
+                } else if (val.isReady) {
+                    statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">100%</span>`;
+                } else {
+                    statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20">${val.score}%</span>`;
+                }
+
+                return `
+                    <div onclick="selectAsset('${asset.id}')" class="group flex items-center gap-3 p-2.5 rounded-xl border transition cursor-pointer ${isSelected ? 'bg-indigo-600/15 border-indigo-500 shadow-sm' : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700'}">
+                        <img src="${asset.previewUrl}" alt="" class="w-14 h-14 rounded-lg object-cover bg-slate-900 flex-shrink-0 border border-slate-800">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-1">
+                                <p class="text-xs font-mono font-medium text-white truncate">${escapeHtml(asset.filename)}</p>
+                                ${statusBadge}
+                            </div>
+                            <p class="text-[11px] text-slate-400 truncate mt-0.5">${asset.title ? escapeHtml(asset.title) : '<em class="text-slate-500">Click Deep Scan with AI...</em>'}</p>
+                            <div class="flex items-center justify-between mt-1 text-[10px] text-slate-500 font-mono">
+                                <span>${asset.keywords.length} tags • ${asset.assetType.toUpperCase()}</span>
+                                <button onclick="event.stopPropagation(); removeAsset('${asset.id}')" class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-rose-400 transition">
+                                    <i class="ph ph-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderInspector() {
+            const emptyEl = document.getElementById('emptyInspector');
+            const activeEl = document.getElementById('activeInspector');
+            const asset = getActiveAsset();
+
+            if (!asset) {
+                emptyEl.classList.remove('hidden');
+                activeEl.classList.add('hidden');
+                activeEl.classList.remove('flex');
+                return;
+            }
+
+            emptyEl.classList.add('hidden');
+            activeEl.classList.remove('hidden');
+            activeEl.classList.add('flex');
+
+            document.getElementById('inspectorImage').src = asset.previewUrl;
+            document.getElementById('inspectorFilename').textContent = asset.filename;
+            document.getElementById('inspectorDimensions').textContent = asset.dimensions;
+            document.getElementById('filenameInput').value = asset.filename;
+            document.getElementById('assetTypeSelect').value = asset.assetType || 'photo';
+            document.getElementById('assetMediaTypeBadge').textContent = (asset.assetType || 'photo').toUpperCase();
+            document.getElementById('aiVisualSummary').textContent = asset.visualSummary || '';
+
+            const hintInput = document.getElementById('customHintInput');
+            if (document.activeElement !== hintInput) {
+                hintInput.value = asset.customHint || '';
+            }
+
+            const videoBadge = document.getElementById('videoGridBadge');
+            if (asset.isVideoGrid || asset.assetType === 'video') {
+                videoBadge.classList.remove('hidden');
+            } else {
+                videoBadge.classList.add('hidden');
+            }
+
+            const epsBadge = document.getElementById('epsModeBadge');
+            const attachEpsBtn = document.getElementById('attachEpsPreviewBtn');
+            const isEpsFile = /\.(eps|ai)$/i.test(asset.filename) || !!asset.epsExtractionMode;
+            if (isEpsFile) {
+                epsBadge.classList.remove('hidden');
+                epsBadge.textContent = asset.epsExtractionMode || 'DIRECT .EPS';
+                attachEpsBtn.classList.remove('hidden');
+            } else {
+                epsBadge.classList.add('hidden');
+                attachEpsBtn.classList.add('hidden');
+            }
+
+            const paletteBar = document.getElementById('colorPaletteBar');
+            if (asset.palette && asset.palette.hexList && asset.palette.hexList.length) {
+                paletteBar.innerHTML = asset.palette.hexList.map(hex =>
+                    `<span class="w-3.5 h-3.5 rounded-full border border-white/20 shadow-sm" style="background-color:${hex}" title="Dominant Color: ${hex}"></span>`
+                ).join('');
+                paletteBar.classList.remove('hidden');
+            } else {
+                paletteBar.classList.add('hidden');
+            }
+
+            const breakdownEl = document.getElementById('fiveLayerBreakdown');
+            if (asset.layers) {
+                breakdownEl.classList.remove('hidden');
+                breakdownEl.classList.add('grid');
+                breakdownEl.innerHTML = `
+                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                        <span class="text-indigo-400 font-semibold block uppercase">1. Literal Subject</span>
+                        <span class="text-slate-300 line-clamp-1" title="${escapeHtml(asset.layers.literal)}">${escapeHtml(asset.layers.literal)}</span>
+                    </div>
+                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                        <span class="text-purple-400 font-semibold block uppercase">2. Human/Subject</span>
+                        <span class="text-slate-300 line-clamp-1" title="${escapeHtml(asset.layers.subject)}">${escapeHtml(asset.layers.subject)}</span>
+                    </div>
+                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                        <span class="text-emerald-400 font-semibold block uppercase">3. Buyer Use-Case</span>
+                        <span class="text-slate-300 line-clamp-1" title="${escapeHtml(asset.layers.commercial)}">${escapeHtml(asset.layers.commercial)}</span>
+                    </div>
+                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                        <span class="text-amber-400 font-semibold block uppercase">4. Tech & Angle</span>
+                        <span class="text-slate-300 line-clamp-1" title="${escapeHtml(asset.layers.technical)}">${escapeHtml(asset.layers.technical)}</span>
+                    </div>
+                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                        <span class="text-sky-400 font-semibold block uppercase">5. Canvas Colors</span>
+                        <span class="text-slate-300 line-clamp-1" title="${escapeHtml(asset.layers.colors)}">${escapeHtml(asset.layers.colors)}</span>
+                    </div>
+                `;
+            } else {
+                breakdownEl.classList.add('hidden');
+                breakdownEl.classList.remove('grid');
+            }
+
+            const stemBadge = document.getElementById('stemmedNoticeBadge');
+            const stemReport = document.getElementById('stemmerReportText');
+            if (asset.stemmedRemovedCount > 0) {
+                stemBadge.classList.remove('hidden');
+                stemBadge.textContent = `${asset.stemmedRemovedCount} Plurals Filtered`;
+                stemReport.textContent = `Smart Stemmer removed ${asset.stemmedRemovedCount} singular/plural duplicate(s) and replaced them with unique buyer keywords.`;
+            } else {
+                stemBadge.classList.add('hidden');
+                stemReport.textContent = `Smart Stemmer Active: 0 singular/plural duplicates detected in your ${asset.keywords.length} keywords.`;
+            }
+
+            const releaseBadge = document.getElementById('releaseNoticeBadge');
+            if (asset.releaseStatus && asset.keywords.length > 0) {
+                releaseBadge.classList.remove('hidden');
+                const needsRelease = /model|property|face|person|people|required/i.test(asset.releaseStatus) && !/no release|not required|none/i.test(asset.releaseStatus);
+                releaseBadge.className = needsRelease
+                    ? 'text-[10px] px-2 py-0.5 rounded-full font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                    : 'text-[10px] px-2 py-0.5 rounded-full font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/20';
+                releaseBadge.textContent = needsRelease ? `⚠️ ${asset.releaseStatus.slice(0, 32)}` : '✓ No Release Needed';
+            } else {
+                releaseBadge.classList.add('hidden');
+            }
+
+            const titleInput = document.getElementById('titleInput');
+            if (document.activeElement !== titleInput) {
+                titleInput.value = asset.title;
+            }
+            updateTitleCounters(asset.title);
+
+            document.getElementById('adobeCategorySelect').value = asset.adobeCategory || 3;
+            document.getElementById('shutterCategory1Select').value = asset.shutterCategory1 || 'Business/Finance';
+            document.getElementById('shutterCategory2Select').value = asset.shutterCategory2 || '';
+            document.getElementById('aiGeneratedCheck').checked = !!asset.isAIGenerated;
+
+            renderValidationBanner(asset);
+            renderKeywordChips(asset);
+        }
+
+        function renderValidationBanner(asset) {
+            const val = validateAsset(asset);
+            const badge = document.getElementById('healthBadge');
+            if (val.isReady) {
+                badge.className = 'text-xs px-2.5 py-0.5 rounded-full font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+                badge.textContent = '100% Agency Compliant';
+            } else {
+                badge.className = 'text-xs px-2.5 py-0.5 rounded-full font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20';
+                badge.textContent = `${val.score}% Ready`;
+            }
+
+            const checksEl = document.getElementById('validationChecks');
+            checksEl.innerHTML = val.checks.map(c => `
+                <div class="p-2 rounded-xl border ${c.passed ? 'bg-slate-950/60 border-slate-800' : 'bg-amber-500/5 border-amber-500/30'} flex items-start gap-2">
+                    <i class="${c.passed ? 'ph-fill ph-check-circle text-emerald-400' : 'ph-fill ph-warning-circle text-amber-400'} text-sm mt-0.5"></i>
+                    <div class="min-w-0 flex-1">
+                        <p class="font-medium text-slate-200 text-[11px]">${c.label}</p>
+                        <p class="text-[10px] ${c.passed ? 'text-slate-400' : 'text-amber-300'} truncate">${c.hint}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderKeywordChips(asset) {
+            const container = document.getElementById('keywordChipsContainer');
+            const targetKw = parseInt(document.getElementById('targetKwCountInput')?.value || '45', 10);
+            const countBadge = document.getElementById('keywordCountBadge');
+            countBadge.textContent = `${asset.keywords.length} / ${targetKw} Target`;
+
+            if (asset.keywords.length === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-500 m-auto py-8 text-center">No keywords yet. Click <strong>"Deep Scan 1536px (Exact 45 Tags)"</strong> above to inspect the image!</div>`;
+            } else {
+                container.innerHTML = asset.keywords.map((kw, idx) => {
+                    const isTop10 = idx < 10;
+                    const isBuyerConcept = idx >= 10 && idx < 25;
+                    let chipStyle = 'bg-slate-900 border-slate-800 text-slate-300';
+                    let numStyle = 'text-slate-500';
+                    if (isTop10) {
+                        chipStyle = 'bg-indigo-500/15 border-indigo-500/40 text-indigo-200';
+                        numStyle = 'text-indigo-400 font-bold';
+                    } else if (isBuyerConcept) {
+                        chipStyle = 'bg-emerald-500/10 border-emerald-500/25 text-emerald-200';
+                        numStyle = 'text-emerald-400';
+                    }
+                    return `
+                        <div class="keyword-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium select-none border ${chipStyle}">
+                            <span class="text-[10px] font-mono ${numStyle}">${idx + 1}</span>
+                            <span>${escapeHtml(kw)}</span>
+                            ${idx > 0 ? `<button onclick="moveKeyword(${idx}, -1)" class="text-slate-500 hover:text-white" title="Move higher"><i class="ph ph-caret-left text-[10px]"></i></button>` : ''}
+                            <button onclick="removeKeyword(${idx})" class="text-slate-500 hover:text-rose-400 ml-0.5" title="Remove"><i class="ph-bold ph-x text-[10px]"></i></button>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            document.getElementById('rawKeywordsTextarea').value = asset.keywords.join(', ');
+        }
+
+        function getActiveAsset() {
+            return assets.find(a => a.id === activeAssetId) || null;
+        }
+
+        function selectAsset(id) {
+            activeAssetId = id;
+            renderAll();
+        }
+
+        function removeAsset(id) {
+            assets = assets.filter(a => a.id !== id);
+            if (activeAssetId === id) {
+                activeAssetId = assets.length ? assets[0].id : null;
+            }
+            renderAll();
+        }
+
+        function setPlatform(platform) {
+            currentPlatform = platform;
+            exportPlatform = platform;
+            ['adobe', 'shutterstock', 'freepik'].forEach(p => {
+                const btn = document.getElementById(`tab-${p}`);
+                btn.className = p === platform
+                    ? 'platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-indigo-600 text-white shadow'
+                    : 'platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-white';
+            });
+            const names = {
+                adobe: 'Adobe Stock Compliance (Top 10 Priority, Max 49 Tags)',
+                shutterstock: 'Shutterstock Compliance (Max 50 Tags, 2 Categories)',
+                freepik: 'Freepik Compliance (Max 50 Tags, Clean Commercial Title)'
+            };
+            document.getElementById('activePlatformLabel').textContent = names[platform];
+            renderAll();
+        }
+
+        function updateCurrentAssetType(val) {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            asset.assetType = val;
+            if (val === 'ai') asset.isAIGenerated = true;
+            renderAll();
+        }
+
+        function swapCurrentExtensionToEPS() {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            asset.filename = asset.filename.replace(/\.[^/.]+$/, '') + '.eps';
+            asset.assetType = 'vector';
+            renderAll();
+            showToast(`Filename changed to ${asset.filename} for vector CSV!`, 'success');
+        }
+
+        function bulkSwapExtension(ext) {
+            assets.forEach(a => {
+                a.filename = a.filename.replace(/\.[^/.]+$/, '') + ext;
+                if (ext === '.eps' || ext === '.svg') a.assetType = 'vector';
+            });
+            closeModal('bulkModal');
+            renderAll();
+            showToast(`Updated all filenames in queue to ${ext}!`, 'success');
+        }
+
+        function updateCurrentTitle(val) {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            asset.title = val;
+            updateTitleCounters(val);
+            renderValidationBanner(asset);
+            renderQueueList();
+        }
+
+        function updateTitleCounters(val) {
+            const maxTitle = currentPlatform === 'freepik' ? 150 : 200;
+            const len = val.trim().length;
+            const words = val.trim().split(/\s+/).filter(Boolean).length;
+            document.getElementById('titleWordCount').textContent = `${words} words`;
+            const charEl = document.getElementById('titleCharCount');
+            charEl.textContent = `${len} / ${maxTitle} chars`;
+            charEl.className = len > maxTitle
+                ? 'px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-semibold'
+                : 'px-2 py-0.5 rounded bg-slate-800 text-slate-300';
+        }
+
+        function updateCurrentFilename(val) {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            asset.filename = val.trim();
+            document.getElementById('inspectorFilename').textContent = asset.filename;
+            renderValidationBanner(asset);
+            renderQueueList();
+        }
+
+        function updateCurrentField(field, value) {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            asset[field] = value;
+            renderAll();
+        }
+
+        function addKeywordsFromInput() {
+            const input = document.getElementById('keywordAddInput');
+            const raw = input.value;
+            if (!raw.trim()) return;
+            const asset = getActiveAsset();
+            if (!asset) return;
+
+            const incoming = raw.split(/[,;\n]+/).map(s => s.trim().toLowerCase()).filter(Boolean);
+            const existingStems = new Set(asset.keywords.map(k => getCanonicalStem(k)));
+            let added = 0;
+
+            incoming.forEach(tag => {
+                const cleanTag = tag.replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, ' ').trim();
+                const stem = getCanonicalStem(cleanTag);
+                if (cleanTag && !isBannedTerm(cleanTag) && !existingStems.has(stem) && asset.keywords.length < 49) {
+                    asset.keywords.push(cleanTag);
+                    existingStems.add(stem);
+                    added++;
+                }
+            });
+            input.value = '';
+            renderAll();
+            if (added > 0) showToast(`Added ${added} clean, stem-checked keyword(s)!`, 'success');
+            else showToast('Keyword skipped (duplicate stem or restricted term).', 'warn');
+        }
+
+        function removeKeyword(index) {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            asset.keywords.splice(index, 1);
+            renderAll();
+        }
+
+        function moveKeyword(index, direction) {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            const target = index + direction;
+            if (target < 0 || target >= asset.keywords.length) return;
+            const temp = asset.keywords[index];
+            asset.keywords[index] = asset.keywords[target];
+            asset.keywords[target] = temp;
+            renderAll();
+        }
+
+        function cleanAndDedupeKeywords() {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            const targetKw = parseInt(document.getElementById('targetKwCountInput')?.value || '45', 10);
+            const res = deduplicateAndGuaranteeKeywords(
+                asset.keywords,
+                asset.backupPool || [],
+                targetKw,
+                asset.assetType,
+                asset.palette?.names || [],
+                asset.title,
+                asset.layers
+            );
+            asset.keywords = res.finalKeywords;
+            asset.stemmedRemovedCount = res.stemmedSkipped;
+            renderAll();
+            showToast(`Cleaned & Stemmed! Removed ${res.stemmedSkipped} plural duplicate(s).`, 'success');
+        }
+
+        function topUpToExactTarget() {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            const targetKw = parseInt(document.getElementById('targetKwCountInput')?.value || '45', 10);
+            const res = deduplicateAndGuaranteeKeywords(
+                asset.keywords,
+                asset.backupPool || [],
+                targetKw,
+                asset.assetType,
+                asset.palette?.names || [],
+                asset.title,
+                asset.layers
+            );
+            asset.keywords = res.finalKeywords;
+            renderAll();
+            showToast(`Guaranteed exact ${asset.keywords.length} anti-spam keywords!`, 'success');
+        }
+
+        function stripExistingXmpFromJpeg(bytes) {
+            if (bytes.length < 4 || bytes[0] !== 0xFF || bytes[1] !== 0xD8) return bytes;
+            const chunks = [bytes.subarray(0, 2)];
+            let pos = 2;
+            const xmpSig = 'http://ns.adobe.com/xap/1.0/\0';
+
+            while (pos + 4 <= bytes.length) {
+                if (bytes[pos] !== 0xFF) {
+                    chunks.push(bytes.subarray(pos));
+                    break;
+                }
+                const marker = bytes[pos + 1];
+                if (marker === 0xDA || marker === 0xD9) {
+                    chunks.push(bytes.subarray(pos));
+                    break;
+                }
+                const segLen = (bytes[pos + 2] << 8) | bytes[pos + 3];
+                if (segLen < 2 || pos + 2 + segLen > bytes.length) {
+                    chunks.push(bytes.subarray(pos));
+                    break;
+                }
+                let isOldXmp = false;
+                if (marker === 0xE1 && segLen > 32) {
+                    const headerStr = new TextDecoder('latin1').decode(bytes.subarray(pos + 4, pos + 4 + xmpSig.length));
+                    if (headerStr === xmpSig) isOldXmp = true;
+                }
+                if (!isOldXmp) {
+                    chunks.push(bytes.subarray(pos, pos + 2 + segLen));
+                }
+                pos += 2 + segLen;
+            }
+
+            const totalLen = chunks.reduce((acc, c) => acc + c.length, 0);
+            const cleanBytes = new Uint8Array(totalLen);
+            let offset = 0;
+            for (const c of chunks) {
+                cleanBytes.set(c, offset);
+                offset += c.length;
+            }
+            return cleanBytes;
+        }
+
+        async function downloadAllEmbeddedJPGs() {
+            const readyAssets = assets.filter(a => a.title && a.keywords.length > 0 && a.assetType !== 'video');
+            if (readyAssets.length === 0) {
+                showToast('No scanned images/vectors ready for XMP embedding yet!', 'warn');
+                return;
+            }
+            showToast(`Embedding metadata into ${readyAssets.length} file(s) at 100% original resolution...`, 'info');
+            for (const item of readyAssets) {
+                await downloadMetadataEmbeddedJPG(item);
+                await new Promise(r => setTimeout(r, 350));
+            }
+        }
+
+        function escapeXml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&apos;');
+        }
+
+        function clearKeywords() {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            asset.keywords = [];
+            renderAll();
+        }
+
+        function syncFromRawTextarea(val) {
+            const asset = getActiveAsset();
+            if (!asset) return;
+            const rawList = val.split(/[,;\n]+/).map(s => s.trim().toLowerCase()).filter(Boolean);
+            const seenStems = new Set();
+            const cleaned = [];
+            for (const item of rawList) {
+                const norm = item.replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, ' ').trim();
+                const stem = getCanonicalStem(norm);
+                if (norm && !isBannedTerm(norm) && !seenStems.has(stem) && cleaned.length < 49) {
+                    seenStems.add(stem);
+                    cleaned.push(norm);
+                }
+            }
+            asset.keywords = cleaned;
+            renderAll();
+        }
+
+        function escapeCSVField(val) {
+            const str = String(val ?? '').replace(/\r?\n|\r/g, ' ').trim();
+            if (str.includes(',') || str.includes('"') || str.includes(';')) {
+                return '"' + str.replace(/"/g, '""') + '"';
+            }
+            return str;
+        }
+
+        function buildCSVString(platform) {
+            const rows = [];
+            if (platform === 'adobe') {
+                rows.push(['Filename', 'Title', 'Keywords', 'Category', 'Releases'].join(','));
+                assets.forEach(a => {
+                    rows.push([
+                        escapeCSVField(a.filename),
+                        escapeCSVField(a.title.slice(0, 200)),
+                        escapeCSVField(a.keywords.slice(0, 49).join(', ')),
+                        escapeCSVField(a.adobeCategory || 3),
+                        escapeCSVField('')
+                    ].join(','));
+                });
+            } else if (platform === 'shutterstock') {
+                rows.push(['Filename', 'Description', 'Keywords', 'Categories', 'Editorial', 'Mature content', 'Illustration'].join(','));
+                assets.forEach(a => {
+                    const cats = [a.shutterCategory1, a.shutterCategory2].filter(Boolean).join(',');
+                    const isIllust = (a.assetType === 'vector' || a.assetType === 'ai' || a.isAIGenerated) ? 'yes' : 'no';
+                    rows.push([
+                        escapeCSVField(a.filename),
+                        escapeCSVField(a.title.slice(0, 200)),
+                        escapeCSVField(a.keywords.slice(0, 50).join(', ')),
+                        escapeCSVField(cats),
+                        'no',
+                        'no',
+                        isIllust
+                    ].join(','));
+                });
+            } else if (platform === 'freepik') {
+                rows.push(['Filename', 'Title', 'Keywords'].join(','));
+                assets.forEach(a => {
+                    rows.push([
+                        escapeCSVField(a.filename),
+                        escapeCSVField(a.title.slice(0, 150)),
+                        escapeCSVField(a.keywords.slice(0, 50).join(', '))
+                    ].join(','));
+                });
+            }
+            return rows.join('\r\n');
+        }
+
+        function openExportModal() {
+            openModal('exportModal');
+            updateExportPreview(currentPlatform);
+        }
+
+        function updateExportPreview(platform) {
+            exportPlatform = platform;
+            ['adobe', 'shutterstock', 'freepik'].forEach(p => {
+                const card = document.getElementById(`exportCard-${p}`);
+                card.className = p === platform
+                    ? 'cursor-pointer p-3.5 rounded-xl border-2 border-indigo-500 bg-indigo-500/10 transition'
+                    : 'cursor-pointer p-3.5 rounded-xl border-2 border-slate-800 bg-slate-950 hover:border-slate-700 transition';
+            });
+            document.getElementById('csvPreviewBox').textContent = buildCSVString(platform);
+        }
+
+        function downloadCSVFile() {
+            const csvContent = buildCSVString(exportPlatform);
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const dateStr = new Date().toISOString().slice(0, 10);
+            a.href = url;
+            a.download = `${exportPlatform}_metadata_${dateStr}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Downloaded 100% compliant ${exportPlatform.toUpperCase()} CSV!`, 'success');
+        }
+
+        function copyTitleToClipboard() {
+            const asset = getActiveAsset();
+            if (!asset || !asset.title) return;
+            copyTextToClipboard(asset.title);
+            showToast('Copied commercial title to clipboard!', 'success');
+        }
+
+        function copyKeywordsToClipboard() {
+            const asset = getActiveAsset();
+            if (!asset || !asset.keywords.length) return;
+            copyTextToClipboard(asset.keywords.join(', '));
+            showToast(`Copied ${asset.keywords.length} keywords to clipboard!`, 'success');
+        }
+
+        function copyRawCSV() {
+            copyTextToClipboard(buildCSVString(exportPlatform));
+            showToast('Copied raw CSV data to clipboard!', 'success');
+        }
+
+        function copyTextToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+
+        function applyBulkAppendKeywords() {
+            const raw = document.getElementById('bulkKeywordsInput').value;
+            const tags = raw.split(/[,;\n]+/).map(s => s.trim().toLowerCase()).filter(Boolean);
+            if (!tags.length) return;
+
+            assets.forEach(a => {
+                const existingStems = new Set(a.keywords.map(k => getCanonicalStem(k)));
+                tags.forEach(t => {
+                    const cleanTag = t.replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, ' ').trim();
+                    const stem = getCanonicalStem(cleanTag);
+                    if (cleanTag && !isBannedTerm(cleanTag) && !existingStems.has(stem) && a.keywords.length < 49) {
+                        a.keywords.push(cleanTag);
+                        existingStems.add(stem);
+                    }
+                });
+            });
+            document.getElementById('bulkKeywordsInput').value = '';
+            closeModal('bulkModal');
+            renderAll();
+            showToast(`Appended stem-checked tag(s) across all assets!`, 'success');
+        }
+
+        function saveApiConfig() {
+            userCustomApiKey = document.getElementById('geminiApiKeyInput').value.trim();
+            const modelSel = document.getElementById('geminiModelSelect').value;
+            const customModel = document.getElementById('customModelInput').value.trim();
+            const targetKw = document.getElementById('targetKwCountInput').value;
+            const kwStyle = document.getElementById('kwStyleSelect').value;
+
+            updateSelectedModelVariable();
+
+            try {
+                localStorage.setItem('metastock_api_key', userCustomApiKey);
+                localStorage.setItem('metastock_model', modelSel);
+                localStorage.setItem('metastock_custom_model', customModel);
+                localStorage.setItem('metastock_target_kw', targetKw);
+                localStorage.setItem('metastock_kw_style', kwStyle);
+            } catch (e) {
+                console.warn('Could not persist settings to localStorage:', e);
+            }
+
+            document.getElementById('apiStatusText').textContent = userCustomApiKey ? 'Custom API Key Active ✓' : 'Engine & API Settings';
+            closeModal('apiModal');
+            renderAll();
+            showToast('Saved Lifetime AI Vision & SEO configuration!', 'success');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300',
+                info: 'bg-indigo-500/15 border-indigo-500/40 text-indigo-300',
+                warn: 'bg-amber-500/15 border-amber-500/40 text-amber-300'
+            };
+            toast.className = `px-4 py-2.5 rounded-xl border backdrop-blur-md shadow-xl text-xs font-medium flex items-center gap-2 transition-all ${colors[type] || colors.info}`;
+            toast.innerHTML = `<i class="ph-fill ph-check-circle text-sm"></i> <span>${escapeHtml(message)}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+    </script>
+</body>
+</html>
