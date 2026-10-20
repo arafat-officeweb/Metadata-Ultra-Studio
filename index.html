@@ -408,10 +408,10 @@
                     <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 bg-slate-950/70 px-3 py-2 rounded-xl border border-slate-800/80">
                         <div class="flex items-center gap-2">
                             <i class="ph-fill ph-shield-check text-emerald-400"></i>
-                            <span id="stemmerReportText">Smart Stemmer Active: Click the 👑 icon on any tag to promote it into your Top 10 Golden SEO Zone.</span>
+                            <span id="stemmerReportText">100% Pure Visual Mode: Zero generic filler words. Every tag comes strictly from AI pixel inspection.</span>
                         </div>
-                        <button onclick="topUpToExactTarget()" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
-                            <i class="ph-bold ph-magic-wand"></i> Force Exact 45 Keywords
+                        <button onclick="topUpToExactTarget()" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1" title="Top up using only AI-verified visual backup synonyms from this image">
+                            <i class="ph-bold ph-magic-wand"></i> Refill from AI Visual Pool
                         </button>
                     </div>
 
@@ -1626,14 +1626,13 @@
         }
 
         function extractVisualTermsFromLayers(title = '', layers = null, colorNames = []) {
-            const stopWords = new Set(['with', 'from', 'that', 'this', 'into', 'over', 'under', 'between', 'through', 'during', 'before', 'after', 'above', 'below', 'for', 'and', 'the', 'in', 'on', 'at', 'to', 'of', 'by', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'but', 'if', 'or', 'because', 'until', 'while', 'about', 'against']);
+            const stopWords = new Set(['with', 'from', 'that', 'this', 'into', 'over', 'under', 'between', 'through', 'during', 'before', 'after', 'above', 'below', 'for', 'and', 'the', 'in', 'on', 'at', 'to', 'of', 'by', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'but', 'if', 'or', 'because', 'until', 'while', 'about', 'against', 'detected', 'analyzed', 'standard', 'composition', 'commercial', 'ready', 'balanced', 'tones']);
             const rawText = [
                 title,
                 layers?.literal || '',
                 layers?.subject || '',
                 layers?.commercial || '',
-                layers?.technical || '',
-                ...(colorNames || [])
+                layers?.technical || ''
             ].join(' ').toLowerCase();
 
             return rawText
@@ -1645,6 +1644,8 @@
 
         function deduplicateAndGuaranteeKeywords(rawKeywords, backupKeywords, targetCount, assetType, colorNames = [], title = '', layers = null) {
             const visualDerivedPool = extractVisualTermsFromLayers(title, layers, colorNames);
+            // ONLY use AI-inspected visual keywords, AI visual backup synonyms, and words directly from the AI visual analysis layers.
+            // ZERO generic hardcoded filler words!
             const combinedCandidates = [...(rawKeywords || []), ...(backupKeywords || []), ...visualDerivedPool];
             const seenExact = new Set();
             const seenStems = new Set();
@@ -1676,24 +1677,6 @@
                     accepted.push(norm);
                 } else {
                     overflowPool.push(norm);
-                }
-            }
-
-            const strictFormatFallbacks = {
-                photo: [...colorNames, 'photography', 'commercial', 'image', 'horizontal', 'composition', 'detail', 'background', 'concept', 'modern', 'professional', 'visual', 'high quality'],
-                vector: [...colorNames, 'vector', 'illustration', 'graphic', 'design', 'artwork', 'element', 'symbol', 'creative', 'modern', 'digital', 'flat', 'commercial'],
-                ai: [...colorNames, 'generative', 'digital art', 'conceptual', 'illustration', 'creative', 'modern', 'visual', 'design', 'artistic', 'composition', 'commercial'],
-                video: [...colorNames, 'footage', 'video', 'clip', 'motion', 'scene', 'sequence', 'movement', 'commercial', 'visual', 'horizontal', 'dynamic', 'production']
-            }[assetType || 'photo'];
-
-            for (const fallbackTag of strictFormatFallbacks) {
-                if (accepted.length >= targetCount) break;
-                const norm = String(fallbackTag).toLowerCase().trim();
-                const stem = getCanonicalStem(norm);
-                if (norm && !seenExact.has(norm) && !seenStems.has(stem) && !isBannedTerm(norm)) {
-                    seenExact.add(norm);
-                    seenStems.add(stem);
-                    accepted.push(norm);
                 }
             }
 
@@ -1960,22 +1943,23 @@
                 const cleanFileHint = asset.filename
                     .replace(/\.[^/.]+$/, '')
                     .replace(/[_-]+/g, ' ')
-                    .replace(/\b(img|dsc|dji|vid|mov|pic|photo|image|vector|art|untitled|\d+)\b/gi, '')
+                    .replace(/\b(img|dsc|dji|vid|mov|pic|photo|image|vector|art|untitled|vecteezy|shutterstock|adobe|freepik|\d+)\b/gi, '')
                     .replace(/\s+/g, ' ')
                     .trim();
 
                 const mediaTypeContext = {
-                    photo: 'Commercial Stock Photograph (1536px HD). Pay close attention to micro-details, ethnicity/age/expression ONLY if people are visibly present (or explicitly note "nobody" ONLY if zero people/body parts exist), actual lighting, actual camera angle, and copy space.',
-                    vector: 'Vector Illustration / Graphic Resource (EPS/SVG/PNG/JPG). Pay close attention to exact illustration style (e.g., cartoon character, flat design, mascot, sticker, isometric, line art, icon, isolated on white background) and commercial usability.',
-                    ai: 'Generative AI Commercial Concept Art. Focus on exact visible subjects, conceptual visual metaphors, lighting, and commercial advertising usability.',
+                    photo: 'Commercial Stock Photograph (1536px HD). Inspect only what is visibly present in the pixels: exact main subject, facial expression/gesture, clothing, props, setting, actual lighting, and camera angle.',
+                    vector: 'Vector Illustration / Graphic Resource (EPS/SVG/PNG/JPG). Inspect exact subject/character, held objects, expression, illustration style (e.g., cartoon, mascot, flat design, sticker, line art, isometric, isolated on white background) and commercial concept.',
+                    ai: 'Generative AI Visual Asset. Inspect exact visible subjects, environment, visual metaphor, lighting, and commercial advertising concept.',
                     video: 'Stock Video Footage represented as a 2x2 Storyboard Grid of 4 sequential frames (10%, 35%, 60%, 85%). Compare Frame 1 to Frame 4 to detect true subject motion, action progression, and camera movement.'
                 }[asset.assetType] || 'Commercial Stock Asset';
 
                 const systemInstruction = `You are the Principal Adobe Stock, Shutterstock & Freepik Search Algorithm Architect.
-YOUR #1 MANDATE: 100% VISUAL TRUTH, ZERO HALLUCINATION & WORLD-CLASS COMMERCIAL SEO CONVERSION.
-- Inspect every pixel carefully: identify the exact subject, character type (if cartoon/mascot/illustration, explicitly tag "cartoon", "character", "mascot", "illustration", "vector"), facial expression, held props/objects, colors, and background (e.g., "isolated", "white background" if on plain white).
-- NEVER invent objects or settings not visible in the image.
-- NEVER use poetic/AI fluff words ("stunning", "breathtaking", "mesmerizing", "masterpiece", "beautiful", "very", "amazing", "hyperrealistic").
+YOUR #1 MANDATE: 100% VISUAL TRUTH, ZERO FAKE/BOGUS KEYWORDS, ZERO GENERIC FILLER.
+- Every single keyword you output MUST be 100% visually true and directly relevant to this specific image.
+- NEVER output bogus or lazy filler words like "image", "visual", "high quality", "modern", "photography", or "horizontal" unless they are specifically required by the visual style.
+- NEVER guess a color from the background if it is just plain white isolation—only tag colors that belong to the actual subject or scene, or tag "white background" / "isolated" if the subject is isolated on white.
+- NEVER invent objects, emotions, or settings not visible in the image pixels.
 
 4-TIER STOCK AGENCY #1 RANKING ARCHITECTURE (STRICT COMPLIANCE):
 1. BUYER-SEARCHABLE TITLE (70 to 145 characters, 10 to 20 words):
@@ -1983,32 +1967,31 @@ YOUR #1 MANDATE: 100% VISUAL TRUTH, ZERO HALLUCINATION & WORLD-CLASS COMMERCIAL 
    - Write in natural, high-converting commercial English. Do not use colons, semicolons, or quotes.
 
 2. TIER 1 — KEYWORDS #1 TO #10 (THE GOLDEN SEO CORE):
-   - Adobe Stock & Shutterstock weight Keywords #1 to #10 highest. Every core noun from your Title MUST appear within the first 7 keywords.
-   - Keyword #1 MUST be the exact primary literal subject.
-   - Keywords #2 to #7 MUST be the literal subject, action, props, and style words directly matching your Title.
-   - Keywords #8 to #10 MUST be the primary commercial category/theme concept.
+   - Every core noun from your Title MUST appear within the first 7 keywords.
+   - Keyword #1 MUST be the exact primary literal subject (e.g., "penguin", "calendar", "coin", "heart", "santa claus", "solar panel").
+   - Keywords #2 to #7 MUST be the exact literal objects, action, and style words directly visible in the image and Title.
+   - Keywords #8 to #10 MUST be the primary commercial theme of the subject.
 
-3. TIER 2 — KEYWORDS #11 TO #25 (HIGH-DEMAND BUYER CONCEPTS & USE-CASES):
-   - Include high-search-volume commercial concepts, holiday/event themes, emotions, and buyer use-cases ONLY if 100% visually applicable (e.g., celebration, holiday, christmas, winter, gift, love, valentine, romance, finance, wealth, calendar, schedule, new year, happiness, greeting card, sticker, mascot).
+3. TIER 2 — KEYWORDS #11 TO #25 (DIRECT BUYER SEARCH CONCEPTS & OCCASIONS):
+   - Include high-search-volume buyer concepts, occasions, holidays, emotions, and commercial use-cases that a buyer looking for THIS EXACT IMAGE would type into Adobe Stock or Shutterstock (e.g., if it is a penguin holding a gift: christmas, winter, holiday, present, gift box, celebration, greeting card, december, seasonal, cute, kawaii).
 
-4. TIER 3 — KEYWORDS #26 TO #38 (SPECIFIC VISUAL MICRO-DETAILS & COLORS):
-   - Include specific visible secondary objects, clothing/accessories (e.g., beanie, scarf, top hat, ribbon, confetti, beard), expressions, and colors visibly present in the frame.
+4. TIER 3 — KEYWORDS #26 TO #40 (SPECIFIC VISUAL MICRO-DETAILS, PROPS & ANATOMY/CLOTHING):
+   - List every visible micro-detail on the subject: clothing items (beanie, scarf, hat, gloves, shoes, ribbon, bow), facial features/expressions (smiling, happy, cheerful, eyes, beak, beard), and distinct subject colors.
 
-5. TIER 4 — KEYWORDS #39 TO #65 (TECHNICAL STYLE & SYNONYM BACKUP POOL):
-   - Include exact visual style, composition, and layout descriptors (e.g., isolated, white background, cartoon, illustration, cute, kawaii, flat design, graphic, clipart, icon, copy space, front view, full length) ONLY if visually true.
-   - Provide 48 primary keywords in 'keywords' and 18 additional image-specific synonyms in 'backupKeywords' (66 total) so our stemmer locks in an exact ${targetKwCount} 100% accurate keywords.
+5. TIER 4 — KEYWORDS #41 TO #55 + 25 BACKUP SYNONYMS (EXACT ART STYLE & CLOSE VISUAL SYNONYMS):
+   - Provide 55 primary keywords in 'keywords' and 25 additional image-specific visual synonyms in 'backupKeywords' (80 total image-specific tags) so that after our singular/plural stemmer removes duplicates, we still have at least ${targetKwCount} 100% genuine, image-specific keywords without EVER needing generic filler!
+   - Include accurate style/composition tags ONLY if true for this image (e.g., cartoon, mascot, character, illustration, vector, clipart, sticker, flat design, isolated, white background, full length, front view).
    - ANTI-SPAM RULE: Never output both singular and plural forms of a word. Always prefer singular nouns.
-   - Format preference: ${kwStyle === 'single' ? 'Strictly single words only' : '80% high-volume single words + 20% high-converting 2-word buyer phrases'}.
+   - Format preference: ${kwStyle === 'single' ? 'Strictly single words only' : '85% high-volume single words + 15% high-converting 2-word buyer phrases'}.
 
 6. OFFICIAL AGENCY CATEGORIES:
    - Adobe Stock Category ID (1 to 21): 1:Animals, 2:Buildings/Architecture, 3:Business, 4:Drinks, 5:Environment, 6:States of Mind, 7:Food, 8:Graphic Resources, 9:Hobbies/Leisure, 10:Industry, 11:Landscapes, 12:Lifestyle, 13:People, 14:Plants/Flowers, 15:Culture/Religion, 16:Science, 17:Social Issues, 18:Sports, 19:Technology, 20:Transport, 21:Travel.
    - Shutterstock Primary & Secondary Categories from: Abstract, Animals/Wildlife, Arts, Backgrounds/Textures, Beauty/Fashion, Buildings/Landmarks, Business/Finance, Celebrities, Education, Food and Drink, Healthcare/Medical, Holidays, Industrial, Interiors, Miscellaneous, Nature, Objects, Parks/Outdoor, People, Religion, Science, Signs/Symbols, Sports/Recreation, Technology, Transportation, Vintage.`;
 
                 const userPrompt = `Carefully inspect the pixels of this ${mediaTypeContext}.
-Dominant Canvas Colors Measured: ${colorHint}.
-${cleanFileHint.length > 3 ? ` Descriptive Filename Context (Verify against pixels): "${cleanFileHint}".` : ''}
+${cleanFileHint.length > 3 ? `Filename Subject Clue (Verify against pixels): "${cleanFileHint}".` : ''}
 ${contributorHint ? `MANDATORY CONTRIBUTOR CONTEXT HINT: "${contributorHint}" (Integrate into Title and Top 5 Keywords).` : ''}
-Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title (70-145 chars), 48 priority-ranked keywords following the 4-Tier SEO Hierarchy, 18 image-specific backup keywords, and the exact official Category IDs.`;
+Provide 55 100% image-specific primary keywords in 'keywords' and 25 image-specific close synonyms in 'backupKeywords'. Do NOT include any generic filler words. Every tag must describe this exact image's subject, props, style, or direct buyer use-case.`;
 
                 const payload = {
                     contents: [{
