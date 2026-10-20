@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -93,23 +94,30 @@
             </div>
 
             <!-- Target Platform Compliance Selector -->
-            <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
-                <button onclick="setPlatform('adobe')" id="tab-adobe" class="platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-indigo-600 text-white shadow">
+            <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 overflow-x-auto">
+                <button onclick="setPlatform('adobe')" id="tab-adobe" class="platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-indigo-600 text-white shadow whitespace-nowrap">
                     <i class="ph-fill ph-file-csv"></i> Adobe Stock
                 </button>
-                <button onclick="setPlatform('shutterstock')" id="tab-shutterstock" class="platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-white">
+                <button onclick="setPlatform('shutterstock')" id="tab-shutterstock" class="platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-white whitespace-nowrap">
                     <i class="ph-fill ph-camera"></i> Shutterstock
                 </button>
-                <button onclick="setPlatform('freepik')" id="tab-freepik" class="platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-white">
+                <button onclick="setPlatform('freepik')" id="tab-freepik" class="platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-white whitespace-nowrap">
                     <i class="ph-fill ph-vector-three"></i> Freepik
+                </button>
+                <button onclick="setPlatform('vecteezy')" id="tab-vecteezy" class="platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-white whitespace-nowrap">
+                    <i class="ph-fill ph-pen-nib"></i> Vecteezy
                 </button>
             </div>
 
             <!-- Right Actions -->
-            <div class="flex items-center gap-2.5">
-                <button onclick="downloadAllEmbeddedJPGs()" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition" title="Embed Title & 45 Keywords into ALL uploaded JPGs losslessly">
+            <div class="flex items-center gap-2">
+                <button onclick="downloadAllEmbeddedZIP()" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition" title="Download all XMP-embedded full-res JPGs in a single ZIP archive">
+                    <i class="ph-bold ph-file-zip"></i>
+                    <span>ZIP Embedded JPGs</span>
+                </button>
+                <button onclick="downloadAllEmbeddedJPGs()" class="hidden xl:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition" title="Embed Title & 45 Keywords into ALL uploaded JPGs losslessly">
                     <i class="ph-bold ph-images"></i>
-                    <span>Embed All JPGs</span>
+                    <span>Embed All</span>
                 </button>
                 <button onclick="openModal('apiModal')" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium transition">
                     <i class="ph-bold ph-sliders text-amber-400"></i>
@@ -154,14 +162,17 @@
 
             <!-- Batch Queue & AI Controls -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3 flex-1">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
                     <div class="flex items-center gap-2">
                         <h2 class="text-sm font-semibold text-white">Batch Queue</h2>
                         <span id="assetCountBadge" class="px-2 py-0.5 text-xs font-mono rounded-md bg-slate-800 text-slate-300">0</span>
                     </div>
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <button onclick="analyzePendingOnlyWithAIVision()" id="retryPendingBtn" class="hidden px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1 transition" title="Scan only remaining 0% / Pending files">
+                            <i class="ph-bold ph-arrows-clockwise"></i> Scan Pending (<span id="pendingBtnCount">0</span>)
+                        </button>
                         <button onclick="analyzeAllWithAIVision()" id="batchAiBtn" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow transition">
-                            <i class="ph-bold ph-sparkle"></i> Analyze All (AI Vision)
+                            <i class="ph-bold ph-sparkle"></i> Analyze All
                         </button>
                         <button onclick="openModal('bulkModal')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium flex items-center gap-1 transition" title="Bulk tools & EPS extension swapper">
                             <i class="ph ph-gear"></i> Bulk
@@ -175,7 +186,10 @@
                         <span id="batchProgressText" class="text-indigo-300 font-medium flex items-center gap-1.5">
                             <i class="ph ph-spinner animate-spin"></i> Scanning pixels with AI Vision...
                         </span>
-                        <span id="batchProgressPercent" class="font-mono text-slate-400">0/0</span>
+                        <div class="flex items-center gap-2">
+                            <span id="batchProgressPercent" class="font-mono text-slate-400">0/0</span>
+                            <button onclick="stopBatchQueue()" id="stopBatchBtn" class="px-1.5 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-[10px] font-semibold">Pause</button>
+                        </div>
                     </div>
                     <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
                         <div id="batchProgressBar" class="h-full bg-indigo-500 transition-all duration-300" style="width: 0%"></div>
@@ -394,7 +408,7 @@
                     <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 bg-slate-950/70 px-3 py-2 rounded-xl border border-slate-800/80">
                         <div class="flex items-center gap-2">
                             <i class="ph-fill ph-shield-check text-emerald-400"></i>
-                            <span id="stemmerReportText">Smart Stemmer Active: Protects words like 'business/series/lens' while blocking plural spam (woman/women, leaf/leaves).</span>
+                            <span id="stemmerReportText">Smart Stemmer Active: Click the 👑 icon on any tag to promote it into your Top 10 Golden SEO Zone.</span>
                         </div>
                         <button onclick="topUpToExactTarget()" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
                             <i class="ph-bold ph-magic-wand"></i> Force Exact 45 Keywords
@@ -446,7 +460,7 @@
             </div>
 
             <div class="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <label onclick="updateExportPreview('adobe')" id="exportCard-adobe" class="cursor-pointer p-3.5 rounded-xl border-2 border-indigo-500 bg-indigo-500/10 transition">
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-sm text-white">Adobe Stock CSV</span>
@@ -459,7 +473,7 @@
                             <span class="font-bold text-sm text-white">Shutterstock CSV</span>
                             <i class="ph ph-circle text-slate-500 text-lg"></i>
                         </div>
-                        <p class="text-[11px] text-slate-400 mt-1 font-mono">Filename, Description, Keywords, Categories, Editorial...</p>
+                        <p class="text-[11px] text-slate-400 mt-1 font-mono">Filename, Description, Keywords, Categories...</p>
                     </label>
                     <label onclick="updateExportPreview('freepik')" id="exportCard-freepik" class="cursor-pointer p-3.5 rounded-xl border-2 border-slate-800 bg-slate-950 hover:border-slate-700 transition">
                         <div class="flex items-center justify-between">
@@ -467,6 +481,13 @@
                             <i class="ph ph-circle text-slate-500 text-lg"></i>
                         </div>
                         <p class="text-[11px] text-slate-400 mt-1 font-mono">Filename, Title, Keywords</p>
+                    </label>
+                    <label onclick="updateExportPreview('vecteezy')" id="exportCard-vecteezy" class="cursor-pointer p-3.5 rounded-xl border-2 border-slate-800 bg-slate-950 hover:border-slate-700 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm text-white">Vecteezy CSV</span>
+                            <i class="ph ph-circle text-slate-500 text-lg"></i>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1 font-mono">Filename, Title, Description, Keywords</p>
                     </label>
                 </div>
 
@@ -507,11 +528,11 @@
             </div>
             <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-200 leading-relaxed space-y-1">
                 <p><strong>1. Inside Gemini Canvas Preview:</strong> Works automatically without any API key using the built-in Gemini 3 Flash Vision server.</p>
-                <p><strong>2. Downloaded on Your PC / Browser:</strong> Paste your free Google AI Studio API Key below once—it saves in your browser for lifetime use!</p>
+                <p><strong>2. Multi-Key Rotation Pool (Pro Speed):</strong> Paste 1 or multiple Gemini API keys (separated by commas). Rotating 2–3 keys bypasses the 15 RPM free limit for non-stop batch scanning!</p>
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1">Google Gemini API Key (Optional in Preview, Saved for Lifetime on PC)</label>
-                <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy... (Leave blank in Canvas Preview, or paste key for PC)" class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs font-mono text-white focus:border-indigo-500 focus:outline-none">
+                <label class="block text-xs font-medium text-slate-400 mb-1">Google Gemini API Key(s) — Single Key or Comma-Separated Pool</label>
+                <input type="password" id="geminiApiKeyInput" placeholder="AIzaSyKey1, AIzaSyKey2... (Leave blank in Preview, or paste key(s) for PC)" class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs font-mono text-white focus:border-indigo-500 focus:outline-none">
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
@@ -540,6 +561,14 @@
                         <option value="single">Strict Single Words Only</option>
                     </select>
                 </div>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Batch Anti-Fail Pacing (Prevents 15 RPM Free API Quota Limit)</label>
+                <select id="batchPaceSelect" class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2 text-xs text-emerald-300 font-medium">
+                    <option value="3200">Safe Zero-Fail Pace (3.2s gap + Auto Quota Cooldown) — Recommended for 20+ Files</option>
+                    <option value="1500">Balanced Pace (1.5s gap + Auto Quota Cooldown)</option>
+                    <option value="400">Turbo Pace (0.4s gap — Best for Paid API Tier or Canvas Server)</option>
+                </select>
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
                 <button onclick="saveApiConfig()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">Save Lifetime Configuration</button>
@@ -575,6 +604,14 @@
                 <button onclick="applyBulkAppendKeywords()" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition">
                     Append Keywords to All Assets
                 </button>
+                <div class="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
+                    <button onclick="downloadAllEmbeddedZIP()" class="flex-1 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                        <i class="ph-bold ph-file-zip"></i> ZIP All Embedded JPGs
+                    </button>
+                    <button onclick="clearSavedQueueSession()" class="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-medium transition" title="Clear auto-saved session cache">
+                        Clear Cache
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -659,13 +696,83 @@
         let exportPlatform = 'adobe';
         let userCustomApiKey = '';
         let selectedGeminiModel = 'gemini-3-flash-preview';
+        let batchAbortRequested = false;
+        let isBatchRunning = false;
+        let apiKeyRotationIndex = 0;
 
         window.addEventListener('DOMContentLoaded', () => {
             loadSavedSettings();
             populateCategoryDropdowns();
             setupDragAndDrop();
+            restoreSessionMetadata();
             renderAll();
         });
+
+        function getActiveApiKeyPool() {
+            if (!userCustomApiKey) return [];
+            return userCustomApiKey
+                .split(/[,;\n\s]+/)
+                .map(k => k.trim())
+                .filter(k => k.length > 10);
+        }
+
+        function saveSessionMetadata() {
+            try {
+                const lightweightQueue = assets.slice(0, 60).map(a => ({
+                    id: a.id,
+                    filename: a.filename,
+                    dimensions: a.dimensions,
+                    previewUrl: a.previewUrl,
+                    base64Jpeg: a.base64Jpeg,
+                    palette: a.palette,
+                    isVideoGrid: a.isVideoGrid,
+                    epsExtractionMode: a.epsExtractionMode,
+                    customHint: a.customHint,
+                    layers: a.layers,
+                    backupPool: a.backupPool,
+                    stemmedRemovedCount: a.stemmedRemovedCount,
+                    assetType: a.assetType,
+                    title: a.title,
+                    keywords: a.keywords,
+                    adobeCategory: a.adobeCategory,
+                    shutterCategory1: a.shutterCategory1,
+                    shutterCategory2: a.shutterCategory2,
+                    isAIGenerated: a.isAIGenerated,
+                    visualSummary: a.visualSummary,
+                    releaseStatus: a.releaseStatus,
+                    isScanning: false
+                }));
+                localStorage.setItem('metastock_session_v6', JSON.stringify(lightweightQueue));
+            } catch (e) {
+                // Ignore quota exceeded if many large base64 previews are stored
+            }
+        }
+
+        function restoreSessionMetadata() {
+            try {
+                const raw = localStorage.getItem('metastock_session_v6');
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    assets = parsed;
+                    activeAssetId = assets[0].id;
+                    showToast(`Restored ${assets.length} asset(s) from your last session!`, 'info');
+                }
+            } catch (e) {
+                console.warn('Session restore skipped:', e);
+            }
+        }
+
+        function clearSavedQueueSession() {
+            try {
+                localStorage.removeItem('metastock_session_v6');
+            } catch (e) {}
+            assets = [];
+            activeAssetId = null;
+            closeModal('bulkModal');
+            renderAll();
+            showToast('Cleared queue and session cache!', 'info');
+        }
 
         function loadSavedSettings() {
             try {
@@ -674,11 +781,13 @@
                 const savedCustomModel = localStorage.getItem('metastock_custom_model');
                 const savedTargetKw = localStorage.getItem('metastock_target_kw');
                 const savedKwStyle = localStorage.getItem('metastock_kw_style');
+                const savedPace = localStorage.getItem('metastock_batch_pace');
 
                 if (savedKey) {
                     userCustomApiKey = savedKey;
                     document.getElementById('geminiApiKeyInput').value = savedKey;
-                    document.getElementById('apiStatusText').textContent = 'Custom API Key Active ✓';
+                    const poolCount = getActiveApiKeyPool().length;
+                    document.getElementById('apiStatusText').textContent = poolCount > 1 ? `${poolCount} API Keys Rotating ✓` : 'Custom API Key Active ✓';
                 }
                 if (savedModel) {
                     document.getElementById('geminiModelSelect').value = savedModel;
@@ -692,6 +801,9 @@
                 }
                 if (savedKwStyle) {
                     document.getElementById('kwStyleSelect').value = savedKwStyle;
+                }
+                if (savedPace && document.getElementById('batchPaceSelect')) {
+                    document.getElementById('batchPaceSelect').value = savedPace;
                 }
                 updateSelectedModelVariable();
             } catch (e) {
@@ -867,11 +979,9 @@
                 activeAssetId = addedAssets[0].id;
             }
             renderAll();
-            showToast(`Loaded ${addedAssets.length} asset(s). Starting 4-Tier AI Vision scan...`, 'info');
+            showToast(`Loaded ${addedAssets.length} asset(s). Starting Zero-Fail AI Vision Queue...`, 'info');
 
-            for (const item of addedAssets) {
-                await analyzeSingleAssetWithGemini(item);
-            }
+            await runZeroFailBatchQueue(addedAssets);
         }
 
         async function extractEPSToDataUrl(file) {
@@ -1594,51 +1704,232 @@
             };
         }
 
-        async function fetchWithRetry(url, options, maxRetries = 4) {
-            let delay = 1000;
-            for (let attempt = 0; attempt < maxRetries; attempt++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.ok) return response;
-                    if (response.status !== 429 && response.status < 500) {
-                        return response;
-                    }
-                } catch (err) {
-                    if (attempt === maxRetries - 1) throw err;
-                }
-                await new Promise(r => setTimeout(r, delay));
-                delay *= 2;
+        function updateBatchBannerStatus(message, isCooldown = false) {
+            const progText = document.getElementById('batchProgressText');
+            if (!progText) return;
+            if (isCooldown) {
+                progText.className = 'text-amber-300 font-semibold flex items-center gap-1.5';
+                progText.innerHTML = `<i class="ph-bold ph-hourglass-high animate-pulse"></i> <span>${escapeHtml(message)}</span>`;
+            } else {
+                progText.className = 'text-indigo-300 font-medium flex items-center gap-1.5';
+                progText.innerHTML = `<i class="ph ph-spinner animate-spin"></i> <span>${escapeHtml(message)}</span>`;
             }
-            throw new Error('API request failed after retries');
+        }
+
+        async function sleepWithCountdown(totalMs, reasonPrefix) {
+            const stepMs = 1000;
+            let remaining = Math.ceil(totalMs / 1000);
+            while (remaining > 0 && !batchAbortRequested) {
+                updateBatchBannerStatus(`${reasonPrefix} — Auto-resuming in ${remaining}s...`, true);
+                await new Promise(r => setTimeout(r, Math.min(stepMs, remaining * 1000)));
+                remaining--;
+            }
+        }
+
+        // Unstoppable API Dispatcher: Supports Multi-Key Rotation Pool, HTTP 429 Cooldowns & Auto Model Fallbacks
+        async function executeResilientGeminiCall(payload, assetFilename = '') {
+            updateSelectedModelVariable();
+            const keyPool = getActiveApiKeyPool();
+
+            // Rotate starting key across requests so 2-3 keys multiply RPM quota automatically
+            const rotatedKeys = [];
+            if (keyPool.length > 0) {
+                for (let i = 0; i < keyPool.length; i++) {
+                    rotatedKeys.push(keyPool[(apiKeyRotationIndex + i) % keyPool.length]);
+                }
+                apiKeyRotationIndex = (apiKeyRotationIndex + 1) % keyPool.length;
+            }
+
+            const candidateRoutes = [];
+            if (rotatedKeys.length > 0) {
+                rotatedKeys.forEach((k, idx) => {
+                    candidateRoutes.push({ model: selectedGeminiModel, key: k, label: `${selectedGeminiModel} (Key #${idx + 1})` });
+                    if (selectedGeminiModel !== 'gemini-2.5-flash') {
+                        candidateRoutes.push({ model: 'gemini-2.5-flash', key: k, label: `gemini-2.5-flash (Key #${idx + 1})` });
+                    }
+                    if (selectedGeminiModel !== 'gemini-3-flash-preview') {
+                        candidateRoutes.push({ model: 'gemini-3-flash-preview', key: k, label: `gemini-3-flash-preview (Key #${idx + 1})` });
+                    }
+                });
+                candidateRoutes.push({ model: 'gemini-3-flash-preview', key: '', label: 'Built-in Server Fallback' });
+            } else {
+                candidateRoutes.push({ model: 'gemini-3-flash-preview', key: '', label: 'Built-in Gemini 3 Flash' });
+            }
+
+            let maxCycles = 5;
+            let lastErrorText = '';
+
+            for (let cycle = 0; cycle < maxCycles; cycle++) {
+                if (batchAbortRequested) throw new Error('Batch paused by user');
+
+                for (let rIdx = 0; rIdx < candidateRoutes.length; rIdx++) {
+                    const route = candidateRoutes[rIdx];
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${route.model}:generateContent?key=${route.key}`;
+
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                            if (rawText) {
+                                return parseResilientJsonFromAI(rawText);
+                            }
+                            lastErrorText = 'Empty candidate text from model';
+                        } else {
+                            const status = response.status;
+                            const errBody = await response.text().catch(() => '');
+                            lastErrorText = `HTTP ${status}: ${errBody.slice(0, 120)}`;
+
+                            // If 404 (model not found) or 400/403 on fallback route, try next route immediately
+                            if (status === 404 || status === 400 || (status === 403 && route.key === '')) {
+                                continue;
+                            }
+
+                            // If HTTP 429 (Rate Limit / Free Tier 15 RPM Quota reached)
+                            if (status === 429) {
+                                // Try next model in chain first before waiting
+                                if (rIdx < candidateRoutes.length - 1) {
+                                    continue;
+                                }
+                                // Parse exact retryDelay from Google error JSON if available, else wait 18s-32s
+                                let waitMs = 18000 + cycle * 7000;
+                                const retryMatch = errBody.match(/retryDelay"\s*:\s*"(\d+)s"/i) || errBody.match(/retry in (\d+(\.\d+)?)s/i);
+                                if (retryMatch && retryMatch[1]) {
+                                    waitMs = (Math.ceil(parseFloat(retryMatch[1])) + 3) * 1000;
+                                }
+                                await sleepWithCountdown(waitMs, `API Rate Limit (15/min) reached on ${assetFilename}`);
+                                break; // Restart route loop after cooldown
+                            }
+
+                            // Server overload 500/502/503/504
+                            if (status >= 500) {
+                                if (rIdx < candidateRoutes.length - 1) continue;
+                                await sleepWithCountdown(5000 * (cycle + 1), `AI Server busy (${status})`);
+                                break;
+                            }
+                        }
+                    } catch (netErr) {
+                        lastErrorText = netErr.message || 'Network connection error';
+                        if (rIdx < candidateRoutes.length - 1) continue;
+                        await sleepWithCountdown(4000 * (cycle + 1), `Network retry (${cycle + 1}/${maxCycles})`);
+                    }
+                }
+            }
+
+            throw new Error(lastErrorText || 'All AI Vision routes exhausted');
+        }
+
+        // Self-healing JSON parser: never fails even if AI includes markdown or minor trailing characters
+        function parseResilientJsonFromAI(rawText) {
+            let cleaned = String(rawText || '')
+                .replace(/^```json\s*/i, '')
+                .replace(/^```\s*/i, '')
+                .replace(/\s*```$/i, '')
+                .trim();
+
+            const firstBrace = cleaned.indexOf('{');
+            const lastBrace = cleaned.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+            }
+
+            try {
+                return JSON.parse(cleaned);
+            } catch (firstErr) {
+                // Attempt automatic repair of unescaped newlines or trailing commas
+                const repaired = cleaned
+                    .replace(/,\s*([}\]])/g, '$1')
+                    .replace(/[\u0000-\u0019]+/g, ' ');
+                return JSON.parse(repaired);
+            }
         }
 
         async function analyzeCurrentWithAIVision() {
             const asset = getActiveAsset();
             if (!asset) return;
+            batchAbortRequested = false;
             await analyzeSingleAssetWithGemini(asset);
+        }
+
+        function stopBatchQueue() {
+            batchAbortRequested = true;
+            showToast('Pausing batch queue after current image completes...', 'info');
+        }
+
+        async function analyzePendingOnlyWithAIVision() {
+            const pendingAssets = assets.filter(a => !validateAsset(a).isReady || a.keywords.length === 0);
+            if (!pendingAssets.length) {
+                showToast('All files in the queue are already 100% Ready!', 'success');
+                return;
+            }
+            await runZeroFailBatchQueue(pendingAssets);
         }
 
         async function analyzeAllWithAIVision() {
             if (!assets.length) return;
+            await runZeroFailBatchQueue(assets);
+        }
+
+        async function runZeroFailBatchQueue(targetList) {
+            if (isBatchRunning) {
+                showToast('Batch scan is already running!', 'info');
+                return;
+            }
+            isBatchRunning = true;
+            batchAbortRequested = false;
+
             const progBox = document.getElementById('batchProgressContainer');
             const progBar = document.getElementById('batchProgressBar');
             const progPct = document.getElementById('batchProgressPercent');
             progBox.classList.remove('hidden');
 
-            for (let i = 0; i < assets.length; i++) {
-                progPct.textContent = `${i + 1}/${assets.length}`;
-                progBar.style.width = `${Math.round(((i + 1) / assets.length) * 100)}%`;
-                activeAssetId = assets[i].id;
+            const paceMs = parseInt(document.getElementById('batchPaceSelect')?.value || '3200', 10);
+            let successCount = 0;
+
+            for (let i = 0; i < targetList.length; i++) {
+                if (batchAbortRequested) break;
+
+                const currentItem = targetList[i];
+                progPct.textContent = `${i + 1}/${targetList.length}`;
+                progBar.style.width = `${Math.round(((i + 1) / targetList.length) * 100)}%`;
+                updateBatchBannerStatus(`Scanning ${currentItem.filename} (${i + 1} of ${targetList.length})...`, false);
+
+                activeAssetId = currentItem.id;
                 renderAll();
-                await analyzeSingleAssetWithGemini(assets[i]);
+
+                const ok = await analyzeSingleAssetWithGemini(currentItem, true);
+                if (ok) successCount++;
+
+                // Smart Anti-Ban Pacing between batch items (Scales faster automatically if user rotates multiple API keys!)
+                if (i < targetList.length - 1 && !batchAbortRequested) {
+                    const keyCount = Math.max(1, getActiveApiKeyPool().length);
+                    const scaledPace = Math.max(400, Math.round(paceMs / keyCount));
+                    const effectiveGap = userCustomApiKey ? scaledPace : Math.min(paceMs, 900);
+                    if (effectiveGap >= 1500 && targetList.length > 3) {
+                        updateBatchBannerStatus(`Pacing queue (${(effectiveGap / 1000).toFixed(1)}s anti-limit buffer) before next file...`, false);
+                    }
+                    await new Promise(r => setTimeout(r, effectiveGap));
+                }
             }
 
+            isBatchRunning = false;
             setTimeout(() => progBox.classList.add('hidden'), 1200);
-            showToast(`Completed 100% Real AI Vision analysis for all ${assets.length} assets!`, 'success');
+            renderAll();
+
+            if (batchAbortRequested) {
+                showToast(`Batch paused. ${successCount}/${targetList.length} assets scanned. Click "Scan Pending" anytime to resume!`, 'info');
+            } else {
+                showToast(`Completed AI Vision scan for ${successCount}/${targetList.length} assets!`, 'success');
+            }
         }
 
-        async function analyzeSingleAssetWithGemini(asset) {
-            if (!asset || asset.isScanning) return;
+        async function analyzeSingleAssetWithGemini(asset, isPartOfBatch = false) {
+            if (!asset || asset.isScanning) return false;
             asset.isScanning = true;
             asset.visualSummary = 'Running 4-Tier Visual SEO Breakdown on 1536px pixels...';
             
@@ -1653,6 +1944,8 @@
             }
             renderQueueList();
 
+            let scanSucceeded = false;
+
             try {
                 if (!asset.base64Jpeg && asset.previewUrl) {
                     const fetched = await fetchRemoteImageAsBase64(asset.previewUrl);
@@ -1664,42 +1957,46 @@
                 const kwStyle = document.getElementById('kwStyleSelect')?.value || 'hybrid';
                 const colorHint = (asset.palette?.names || []).join(', ') || 'balanced tones';
                 const contributorHint = (asset.customHint || '').trim();
-                updateSelectedModelVariable();
+                const cleanFileHint = asset.filename
+                    .replace(/\.[^/.]+$/, '')
+                    .replace(/[_-]+/g, ' ')
+                    .replace(/\b(img|dsc|dji|vid|mov|pic|photo|image|vector|art|untitled|\d+)\b/gi, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
 
                 const mediaTypeContext = {
                     photo: 'Commercial Stock Photograph (1536px HD). Pay close attention to micro-details, ethnicity/age/expression ONLY if people are visibly present (or explicitly note "nobody" ONLY if zero people/body parts exist), actual lighting, actual camera angle, and copy space.',
-                    vector: 'Vector Illustration / Graphic Resource (EPS/SVG). Pay close attention to exact illustration style (e.g., flat design, isometric, line art, icon set, infographic, seamless pattern, isolated element) and commercial usability.',
+                    vector: 'Vector Illustration / Graphic Resource (EPS/SVG/PNG/JPG). Pay close attention to exact illustration style (e.g., cartoon character, flat design, mascot, sticker, isometric, line art, icon, isolated on white background) and commercial usability.',
                     ai: 'Generative AI Commercial Concept Art. Focus on exact visible subjects, conceptual visual metaphors, lighting, and commercial advertising usability.',
                     video: 'Stock Video Footage represented as a 2x2 Storyboard Grid of 4 sequential frames (10%, 35%, 60%, 85%). Compare Frame 1 to Frame 4 to detect true subject motion, action progression, and camera movement.'
                 }[asset.assetType] || 'Commercial Stock Asset';
 
                 const systemInstruction = `You are the Principal Adobe Stock, Shutterstock & Freepik Search Algorithm Architect.
-YOUR #1 MANDATE: 100% VISUAL TRUTH, ZERO HALLUCINATION & MAXIMUM BUYER CONVERSION.
-- NEVER invent, guess, or hallucinate any object, person, emotion, setting, or lighting that is not 100% visible in the image pixels.
-- NEVER use filename text unless the contributor explicitly wrote a hint.
+YOUR #1 MANDATE: 100% VISUAL TRUTH, ZERO HALLUCINATION & WORLD-CLASS COMMERCIAL SEO CONVERSION.
+- Inspect every pixel carefully: identify the exact subject, character type (if cartoon/mascot/illustration, explicitly tag "cartoon", "character", "mascot", "illustration", "vector"), facial expression, held props/objects, colors, and background (e.g., "isolated", "white background" if on plain white).
+- NEVER invent objects or settings not visible in the image.
 - NEVER use poetic/AI fluff words ("stunning", "breathtaking", "mesmerizing", "masterpiece", "beautiful", "very", "amazing", "hyperrealistic").
 
 4-TIER STOCK AGENCY #1 RANKING ARCHITECTURE (STRICT COMPLIANCE):
-1. BUYER-SEARCHABLE TITLE (70 to 150 characters, 10 to 22 words):
-   - Structure: [Exact Literal Main Subject] + [Visible Action/State] + [Exact Setting/Background] + [Commercial Purpose/Composition, e.g., copy space, isolated on white, close up].
-   - Write in natural, factual commercial English. Do not use colons, semicolons, or quotes.
+1. BUYER-SEARCHABLE TITLE (70 to 145 characters, 10 to 20 words):
+   - Structure: [Exact Literal Main Subject/Character] + [Visible Action/Pose & Held Objects] + [Exact Style/Setting/Background] + [Commercial Purpose, e.g., isolated on white background, copy space].
+   - Write in natural, high-converting commercial English. Do not use colons, semicolons, or quotes.
 
 2. TIER 1 — KEYWORDS #1 TO #10 (THE GOLDEN SEO CORE):
    - Adobe Stock & Shutterstock weight Keywords #1 to #10 highest. Every core noun from your Title MUST appear within the first 7 keywords.
    - Keyword #1 MUST be the exact primary literal subject.
-   - Keywords #2 to #7 MUST be the literal subject, action, and setting words directly matching your Title.
-   - Keywords #8 to #10 MUST be the primary commercial industry or category concept.
+   - Keywords #2 to #7 MUST be the literal subject, action, props, and style words directly matching your Title.
+   - Keywords #8 to #10 MUST be the primary commercial category/theme concept.
 
-3. TIER 2 — KEYWORDS #11 TO #25 (HIGH-DEMAND BUYER CONCEPTS & MOOD):
-   - Include high-search-volume commercial concepts, themes, and buyer use-cases ONLY if 100% visually applicable to this image (e.g., sustainability, renewable energy, innovation, teamwork, cybersecurity, wellness, healthy eating, luxury, minimalism, celebration, financial growth).
+3. TIER 2 — KEYWORDS #11 TO #25 (HIGH-DEMAND BUYER CONCEPTS & USE-CASES):
+   - Include high-search-volume commercial concepts, holiday/event themes, emotions, and buyer use-cases ONLY if 100% visually applicable (e.g., celebration, holiday, christmas, winter, gift, love, valentine, romance, finance, wealth, calendar, schedule, new year, happiness, greeting card, sticker, mascot).
 
-4. TIER 3 — KEYWORDS #26 TO #38 (SPECIFIC VISUAL MICRO-DETAILS & ENVIRONMENT):
-   - Include specific visible secondary objects, textures, materials, clothing details, weather, time of day, or natural elements visibly present in the frame.
-   - If zero people or body parts are visible, include "nobody". If a person/hand is visible, NEVER include "nobody".
+4. TIER 3 — KEYWORDS #26 TO #38 (SPECIFIC VISUAL MICRO-DETAILS & COLORS):
+   - Include specific visible secondary objects, clothing/accessories (e.g., beanie, scarf, top hat, ribbon, confetti, beard), expressions, and colors visibly present in the frame.
 
-5. TIER 4 — KEYWORDS #39 TO #70 (TECHNICAL COMPOSITION & SYNONYM BACKUP POOL):
-   - Include exact camera angle, lighting, and layout descriptors (e.g., copy space, selective focus, aerial view, flat lay, close up, top view, side view, studio shot, bokeh, silhouette, isometric, line art) ONLY if visually true.
-   - Provide 50 primary keywords in 'keywords' and 20 additional image-specific synonyms in 'backupKeywords' (70 total) so our stemmer locks in an exact ${targetKwCount} 100% accurate keywords.
+5. TIER 4 — KEYWORDS #39 TO #65 (TECHNICAL STYLE & SYNONYM BACKUP POOL):
+   - Include exact visual style, composition, and layout descriptors (e.g., isolated, white background, cartoon, illustration, cute, kawaii, flat design, graphic, clipart, icon, copy space, front view, full length) ONLY if visually true.
+   - Provide 48 primary keywords in 'keywords' and 18 additional image-specific synonyms in 'backupKeywords' (66 total) so our stemmer locks in an exact ${targetKwCount} 100% accurate keywords.
    - ANTI-SPAM RULE: Never output both singular and plural forms of a word. Always prefer singular nouns.
    - Format preference: ${kwStyle === 'single' ? 'Strictly single words only' : '80% high-volume single words + 20% high-converting 2-word buyer phrases'}.
 
@@ -1709,12 +2006,9 @@ YOUR #1 MANDATE: 100% VISUAL TRUTH, ZERO HALLUCINATION & MAXIMUM BUYER CONVERSIO
 
                 const userPrompt = `Carefully inspect the pixels of this ${mediaTypeContext}.
 Dominant Canvas Colors Measured: ${colorHint}.
-${contributorHint ? `MANDATORY CONTRIBUTOR CONTEXT HINT: "${contributorHint}" (Ensure this exact factual context is integrated into the Title and Top 5 Keywords).` : ''}
-Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title (70-150 chars), 50 priority-ranked keywords following the 4-Tier SEO Hierarchy, 20 image-specific backup keywords, and the exact official Category IDs.`;
-
-                const apiKey = userCustomApiKey || "";
-                const activeModel = userCustomApiKey ? selectedGeminiModel : 'gemini-3-flash-preview';
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey}`;
+${cleanFileHint.length > 3 ? ` Descriptive Filename Context (Verify against pixels): "${cleanFileHint}".` : ''}
+${contributorHint ? `MANDATORY CONTRIBUTOR CONTEXT HINT: "${contributorHint}" (Integrate into Title and Top 5 Keywords).` : ''}
+Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title (70-145 chars), 48 priority-ranked keywords following the 4-Tier SEO Hierarchy, 18 image-specific backup keywords, and the exact official Category IDs.`;
 
                 const payload = {
                     contents: [{
@@ -1756,6 +2050,7 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
                                 adobeCategory: { type: "INTEGER" },
                                 shutterCategory1: { type: "STRING" },
                                 shutterCategory2: { type: "STRING" },
+                                detectedMediaType: { type: "STRING" },
                                 releaseRequirement: { type: "STRING" }
                             },
                             propertyOrdering: [
@@ -1770,29 +2065,20 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
                                 "adobeCategory",
                                 "shutterCategory1",
                                 "shutterCategory2",
+                                "detectedMediaType",
                                 "releaseRequirement"
                             ]
                         }
                     }
                 };
 
-                const response = await fetchWithRetry(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                const parsed = await executeResilientGeminiCall(payload, asset.filename);
 
-                if (!response.ok) {
-                    const errText = await response.text();
-                    throw new Error(`API HTTP ${response.status}: ${errText}`);
+                // Auto-upgrade Media Type to 'vector' if AI detects a cartoon/mascot/vector illustration uploaded as JPG/PNG
+                const combinedCheck = `${parsed.detectedMediaType || ''} ${parsed.layerTechnicalComposition || ''} ${parsed.title || ''}`.toLowerCase();
+                if (asset.assetType === 'photo' && /\b(cartoon|mascot|vector|illustration|clipart|flat design|sticker|kawaii|line art)\b/i.test(combinedCheck)) {
+                    asset.assetType = 'vector';
                 }
-
-                const result = await response.json();
-                let rawJson = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!rawJson) throw new Error('Empty response from Gemini Vision API');
-
-                rawJson = rawJson.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/, '').trim();
-                const parsed = JSON.parse(rawJson);
 
                 if (parsed.title) {
                     asset.title = sanitizeTextForStock(parsed.title).slice(0, 195);
@@ -1836,16 +2122,16 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
                     asset.releaseStatus = parsed.releaseRequirement;
                 }
 
-                showToast(`100% Pure Scan Complete: Locked exact ${asset.keywords.length} high-ranking tags!`, 'success');
+                scanSucceeded = true;
+                saveSessionMetadata();
+                if (!isPartOfBatch) {
+                    showToast(`100% Pure Scan Complete: Locked exact ${asset.keywords.length} high-ranking tags!`, 'success');
+                }
             } catch (err) {
                 console.error('AI Vision Error:', err);
-                if (!userCustomApiKey) {
-                    asset.visualSummary = 'Standalone Browser Mode Detected: Click "Engine & API Settings" to paste your free Gemini API Key.';
-                    showToast('Running outside Canvas Preview? Paste your Gemini API Key in Settings!', 'warn');
-                    openModal('apiModal');
-                } else {
-                    asset.visualSummary = 'AI Vision encountered an error. Check your API key or model selection and retry.';
-                    showToast('AI Vision request failed. Check API Key / Model settings.', 'warn');
+                asset.visualSummary = `Scan paused (${err.message || 'Quota/Network'}). Click "Scan Pending" or "Deep Scan" to resume.`;
+                if (!isPartOfBatch) {
+                    showToast(`Scan paused: ${err.message}. Click Deep Scan to retry.`, 'warn');
                 }
             } finally {
                 asset.isScanning = false;
@@ -1858,6 +2144,8 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
                 }
                 renderAll();
             }
+
+            return scanSucceeded;
         }
 
         function isBannedTerm(word) {
@@ -1948,8 +2236,20 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
 
             let readyCount = 0;
             assets.forEach(a => { if (validateAsset(a).isReady) readyCount++; });
+            const pendingCount = assets.length - readyCount;
             document.getElementById('statReady').textContent = readyCount;
-            document.getElementById('statIncomplete').textContent = assets.length - readyCount;
+            document.getElementById('statIncomplete').textContent = pendingCount;
+
+            const retryPendingBtn = document.getElementById('retryPendingBtn');
+            const pendingBtnCount = document.getElementById('pendingBtnCount');
+            if (retryPendingBtn && pendingBtnCount) {
+                if (pendingCount > 0) {
+                    retryPendingBtn.classList.remove('hidden');
+                    pendingBtnCount.textContent = pendingCount;
+                } else {
+                    retryPendingBtn.classList.add('hidden');
+                }
+            }
 
             if (assets.length === 0) {
                 listEl.innerHTML = `<div class="text-center py-8 text-xs text-slate-500">No files in queue. Drop photos, vectors, or videos above!</div>`;
@@ -2164,6 +2464,7 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
                         <div class="keyword-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium select-none border ${chipStyle}">
                             <span class="text-[10px] font-mono ${numStyle}">${idx + 1}</span>
                             <span>${escapeHtml(kw)}</span>
+                            ${idx >= 10 ? `<button onclick="promoteKeywordToTop10(${idx})" class="text-amber-400/70 hover:text-amber-300" title="Promote to Top 10 Golden SEO Zone"><i class="ph-fill ph-crown text-[10px]"></i></button>` : ''}
                             ${idx > 0 ? `<button onclick="moveKeyword(${idx}, -1)" class="text-slate-500 hover:text-white" title="Move higher"><i class="ph ph-caret-left text-[10px]"></i></button>` : ''}
                             <button onclick="removeKeyword(${idx})" class="text-slate-500 hover:text-rose-400 ml-0.5" title="Remove"><i class="ph-bold ph-x text-[10px]"></i></button>
                         </div>
@@ -2172,6 +2473,16 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
             }
 
             document.getElementById('rawKeywordsTextarea').value = asset.keywords.join(', ');
+        }
+
+        function promoteKeywordToTop10(index) {
+            const asset = getActiveAsset();
+            if (!asset || index < 10 || index >= asset.keywords.length) return;
+            const [tag] = asset.keywords.splice(index, 1);
+            asset.keywords.splice(9, 0, tag);
+            saveSessionMetadata();
+            renderAll();
+            showToast(`Promoted "${tag}" into the Top 10 Golden SEO Zone!`, 'success');
         }
 
         function getActiveAsset() {
@@ -2194,18 +2505,20 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
         function setPlatform(platform) {
             currentPlatform = platform;
             exportPlatform = platform;
-            ['adobe', 'shutterstock', 'freepik'].forEach(p => {
+            ['adobe', 'shutterstock', 'freepik', 'vecteezy'].forEach(p => {
                 const btn = document.getElementById(`tab-${p}`);
+                if (!btn) return;
                 btn.className = p === platform
-                    ? 'platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-indigo-600 text-white shadow'
-                    : 'platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-white';
+                    ? 'platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-indigo-600 text-white shadow whitespace-nowrap'
+                    : 'platform-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-white whitespace-nowrap';
             });
             const names = {
                 adobe: 'Adobe Stock Compliance (Top 10 Priority, Max 49 Tags)',
                 shutterstock: 'Shutterstock Compliance (Max 50 Tags, 2 Categories)',
-                freepik: 'Freepik Compliance (Max 50 Tags, Clean Commercial Title)'
+                freepik: 'Freepik Compliance (Max 50 Tags, Clean Commercial Title)',
+                vecteezy: 'Vecteezy Compliance (Title, Description & Max 50 Tags)'
             };
-            document.getElementById('activePlatformLabel').textContent = names[platform];
+            document.getElementById('activePlatformLabel').textContent = names[platform] || names.adobe;
             renderAll();
         }
 
@@ -2409,6 +2722,106 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
             }
         }
 
+        async function buildLosslessEmbeddedJpegBytesForAsset(asset) {
+            let rawBytes = null;
+            if (asset.originalFile) {
+                const origBuffer = await asset.originalFile.arrayBuffer();
+                const candidateBytes = new Uint8Array(origBuffer);
+                if (candidateBytes.length > 4 && candidateBytes[0] === 0xFF && candidateBytes[1] === 0xD8) {
+                    rawBytes = candidateBytes;
+                }
+            }
+            if (!rawBytes) {
+                if (asset.originalFile && asset.originalFile.type.startsWith('image/') && !/\.(eps|ai)$/i.test(asset.originalFile.name)) {
+                    rawBytes = await renderFullResolutionJpegBytes(asset.originalFile);
+                } else if (asset.previewUrl) {
+                    const base64Data = asset.previewUrl.split(',')[1];
+                    const binaryStr = atob(base64Data);
+                    rawBytes = new Uint8Array(binaryStr.length);
+                    for (let i = 0; i < binaryStr.length; i++) rawBytes[i] = binaryStr.charCodeAt(i);
+                }
+            }
+            if (!rawBytes || rawBytes[0] !== 0xFF || rawBytes[1] !== 0xD8) return null;
+
+            const origBytes = stripExistingXmpFromJpeg(rawBytes);
+            const cleanTitle = escapeXml(asset.title);
+            const kwBagItems = asset.keywords.map(k => `<rdf:li>${escapeXml(k)}</rdf:li>`).join('');
+            const xmpXml = `<?xpacket begin="\uFEFF" id="W5M0MpCehiHzreSzNTczkc9d"?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/">
+ <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about=""
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:photoshop="http://ns.adobe.com/photoshop/1.0/">
+   <photoshop:Headline>${cleanTitle}</photoshop:Headline>
+   <dc:title><rdf:Alt><rdf:li xml:lang="x-default">${cleanTitle}</rdf:li></rdf:Alt></dc:title>
+   <dc:description><rdf:Alt><rdf:li xml:lang="x-default">${cleanTitle}</rdf:li></rdf:Alt></dc:description>
+   <dc:subject><rdf:Bag>${kwBagItems}</rdf:Bag></dc:subject>
+  </rdf:Description>
+ </rdf:RDF>
+</x:xmpmeta>
+<?xpacket end="w"?>`;
+
+            const encoder = new TextEncoder();
+            const headerBytes = encoder.encode('http://ns.adobe.com/xap/1.0/\0');
+            const xmlBytes = encoder.encode(xmpXml);
+            const app1Length = 2 + headerBytes.length + xmlBytes.length;
+
+            const app1Segment = new Uint8Array(2 + app1Length);
+            app1Segment[0] = 0xFF;
+            app1Segment[1] = 0xE1;
+            app1Segment[2] = (app1Length >> 8) & 0xFF;
+            app1Segment[3] = app1Length & 0xFF;
+            app1Segment.set(headerBytes, 4);
+            app1Segment.set(xmlBytes, 4 + headerBytes.length);
+
+            const combined = new Uint8Array(origBytes.length + app1Segment.length);
+            combined.set(origBytes.subarray(0, 2), 0);
+            combined.set(app1Segment, 2);
+            combined.set(origBytes.subarray(2), 2 + app1Segment.length);
+            return combined;
+        }
+
+        async function downloadAllEmbeddedZIP() {
+            const readyAssets = assets.filter(a => a.title && a.keywords.length > 0 && a.assetType !== 'video');
+            if (readyAssets.length === 0) {
+                showToast('No scanned images ready to ZIP yet! Run Analyze All first.', 'warn');
+                return;
+            }
+            if (typeof JSZip === 'undefined') {
+                await downloadAllEmbeddedJPGs();
+                return;
+            }
+
+            showToast(`Packaging ${readyAssets.length} XMP-embedded JPGs + CSVs into 1 ZIP archive...`, 'info');
+            const zip = new JSZip();
+            const imgFolder = zip.folder('Embedded_JPGs');
+
+            for (const item of readyAssets) {
+                const embeddedBytes = await buildLosslessEmbeddedJpegBytesForAsset(item);
+                if (embeddedBytes) {
+                    const outName = item.filename.replace(/\.[^/.]+$/, '') + '.jpg';
+                    imgFolder.file(outName, embeddedBytes);
+                }
+            }
+
+            zip.file('adobe_stock_metadata.csv', '\uFEFF' + buildCSVString('adobe'));
+            zip.file('shutterstock_metadata.csv', '\uFEFF' + buildCSVString('shutterstock'));
+            zip.file('freepik_metadata.csv', '\uFEFF' + buildCSVString('freepik'));
+            zip.file('vecteezy_metadata.csv', '\uFEFF' + buildCSVString('vecteezy'));
+
+            const zipBlob = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(zipBlob);
+            const a = document.createElement('a');
+            const dateStr = new Date().toISOString().slice(0, 10);
+            a.href = url;
+            a.download = `Metadata_Ultra_Studio_Bundle_${dateStr}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Downloaded ZIP with ${readyAssets.length} Embedded JPGs + 4 Agency CSVs!`, 'success');
+        }
+
         function escapeXml(str) {
             return String(str ?? '')
                 .replace(/&/g, '&amp;')
@@ -2488,6 +2901,16 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
                         escapeCSVField(a.keywords.slice(0, 50).join(', '))
                     ].join(','));
                 });
+            } else if (platform === 'vecteezy') {
+                rows.push(['Filename', 'Title', 'Description', 'Keywords'].join(','));
+                assets.forEach(a => {
+                    rows.push([
+                        escapeCSVField(a.filename),
+                        escapeCSVField(a.title.slice(0, 200)),
+                        escapeCSVField(a.title.slice(0, 200)),
+                        escapeCSVField(a.keywords.slice(0, 50).join(', '))
+                    ].join(','));
+                });
             }
             return rows.join('\r\n');
         }
@@ -2499,8 +2922,9 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
 
         function updateExportPreview(platform) {
             exportPlatform = platform;
-            ['adobe', 'shutterstock', 'freepik'].forEach(p => {
+            ['adobe', 'shutterstock', 'freepik', 'vecteezy'].forEach(p => {
                 const card = document.getElementById(`exportCard-${p}`);
+                if (!card) return;
                 card.className = p === platform
                     ? 'cursor-pointer p-3.5 rounded-xl border-2 border-indigo-500 bg-indigo-500/10 transition'
                     : 'cursor-pointer p-3.5 rounded-xl border-2 border-slate-800 bg-slate-950 hover:border-slate-700 transition';
@@ -2579,6 +3003,7 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
             const customModel = document.getElementById('customModelInput').value.trim();
             const targetKw = document.getElementById('targetKwCountInput').value;
             const kwStyle = document.getElementById('kwStyleSelect').value;
+            const batchPace = document.getElementById('batchPaceSelect')?.value || '3200';
 
             updateSelectedModelVariable();
 
@@ -2588,14 +3013,18 @@ Generate the 5-layer visual inspection report, an Adobe Stock Best-Seller Title 
                 localStorage.setItem('metastock_custom_model', customModel);
                 localStorage.setItem('metastock_target_kw', targetKw);
                 localStorage.setItem('metastock_kw_style', kwStyle);
+                localStorage.setItem('metastock_batch_pace', batchPace);
             } catch (e) {
                 console.warn('Could not persist settings to localStorage:', e);
             }
 
-            document.getElementById('apiStatusText').textContent = userCustomApiKey ? 'Custom API Key Active ✓' : 'Engine & API Settings';
+            const poolCount = getActiveApiKeyPool().length;
+            document.getElementById('apiStatusText').textContent = poolCount > 1
+                ? `${poolCount} API Keys Rotating ✓`
+                : (poolCount === 1 ? 'Custom API Key Active ✓' : 'Engine & API Settings');
             closeModal('apiModal');
             renderAll();
-            showToast('Saved Lifetime AI Vision & SEO configuration!', 'success');
+            showToast('Saved Lifetime AI Vision & Multi-Key Rotation configuration!', 'success');
         }
 
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
