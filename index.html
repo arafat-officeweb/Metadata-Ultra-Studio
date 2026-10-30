@@ -149,7 +149,7 @@
                 </div>
                 <p class="text-sm font-semibold text-white">Drop Photo, Direct .EPS / .SVG Vector, Video or AI Art</p>
                 <p class="text-xs text-slate-400 mt-1">Supports <span class="text-indigo-300 font-mono">EPS, AI, SVG, JPG, PNG, WEBP, MP4, MOV</span></p>
-                <p class="text-[10px] text-emerald-400/90 mt-1 font-medium"><i class="ph-fill ph-sparkle"></i> EPS/AI without a preview needs its matching JPG/PNG. Upload both together with the same filename, or select the vector and click “Choose Preview”.</p>
+                <p class="text-[10px] text-emerald-400/90 mt-1 font-medium"><i class="ph-fill ph-sparkle"></i> For vector files without an embedded preview, add the matching JPG/PNG so AI analysis uses the real artwork.</p>
                 
                 <!-- Quick Preset Mode before uploading -->
                 <div class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-1.5" onclick="event.stopPropagation()">
@@ -262,13 +262,7 @@
                     
                     <!-- Visual Preview Box with Scanner Animation -->
                     <div class="md:col-span-4 relative rounded-xl overflow-hidden bg-slate-950 border border-slate-800 aspect-video md:aspect-[4/3] flex items-center justify-center">
-                        <img id="inspectorImage" alt="Asset Preview" class="hidden w-full h-full object-contain">
-                        <div id="inspectorNoPreview" class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 p-4 text-center bg-slate-950/95">
-                            <i class="ph-duotone ph-file-image text-4xl text-amber-300"></i>
-                            <p class="text-sm font-semibold text-white">No raster preview available</p>
-                            <p class="max-w-xs text-xs leading-relaxed text-slate-400">This EPS/AI vector cannot be sent to image analysis until you attach its matching JPG or PNG preview.</p>
-                            <button type="button" onclick="triggerAttachEPSPreview()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">Choose matching preview</button>
-                        </div>
+                        <img id="inspectorImage" src="" alt="Asset Preview" class="w-full h-full object-contain">
                         <div id="scannerOverlay" class="hidden absolute inset-0 scanner-beam pointer-events-none"></div>
                         <div class="absolute top-2 left-2 flex flex-wrap items-center gap-1.5">
                             <span id="assetMediaTypeBadge" class="px-2 py-0.5 rounded-md text-[10px] font-mono uppercase font-semibold bg-slate-950/90 text-indigo-300 border border-slate-700">PHOTO</span>
@@ -280,7 +274,7 @@
                         <div class="absolute bottom-2 left-2 right-2 bg-slate-950/90 backdrop-blur-md px-2.5 py-1.5 rounded-lg border border-slate-800 flex items-center justify-between text-[11px]">
                             <span id="inspectorFilename" class="font-mono text-slate-200 truncate max-w-[150px]">IMG_0001.jpg</span>
                             <div class="flex items-center gap-1.5">
-                                <button id="attachEpsPreviewBtn" onclick="triggerAttachEPSPreview()" class="hidden px-2 py-0.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-medium transition" title="Choose the matching JPG/PNG preview so this EPS/AI artwork can be analyzed">+ Choose Preview</button>
+                                <button id="attachEpsPreviewBtn" onclick="triggerAttachEPSPreview()" class="hidden px-2 py-0.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-medium transition" title="Attach the matching raster preview so the vector artwork can be analyzed">+ Attach Preview</button>
                                 <span id="inspectorDimensions" class="text-slate-400 font-mono">4000×2667</span>
                             </div>
                         </div>
@@ -345,6 +339,10 @@
                         <!-- Live Compliance Validation Grid -->
                         <div id="validationChecks" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"></div>
                     </div>
+                </div>
+
+                <div id="previewMatchReviewWrap" class="hidden bg-amber-500/5 border border-amber-500/25 rounded-xl px-3 py-2">
+                    <label class="flex items-start gap-2 text-xs text-amber-100 cursor-pointer"><input type="checkbox" id="previewMatchVerifiedCheck" onchange="togglePreviewMatchVerified(this.checked)" class="mt-0.5"><span><strong>EPS/AI preview review:</strong> I visually checked that this raster preview matches the actual vector artwork. AI cannot verify this file-to-preview match.</span></label>
                 </div>
 
                 <!-- Commercial SEO Title & Official Categories Card -->
@@ -1242,27 +1240,16 @@
             saveSessionMetadata();
             renderAll();
             const analyzable = addedAssets.filter(a => a.base64Jpeg);
-            const vectorsNeedingPreview = addedAssets.filter(a => a.requiresPreviewConfirmation === true && !a.base64Jpeg);
             if (rejectedCount) showToast(`Skipped ${rejectedCount} unsupported file(s).`, 'warn');
             if (analyzable.length) {
                 if (geminiApiKeys.length) {
                     showToast(`Loaded ${addedAssets.length} file(s); scanning ${analyzable.length} with AI Vision...`, 'info');
                     await runBatchAnalysisQueue(analyzable);
-                    if (vectorsNeedingPreview.length) {
-                        activeAssetId = vectorsNeedingPreview[0].id;
-                        renderAll();
-                        showToast(`${vectorsNeedingPreview.length} EPS/AI vector(s) need a matching JPG/PNG preview. Select one, then click “Choose Preview”.`, 'warn');
-                    }
                 } else {
-                    if (vectorsNeedingPreview.length) activeAssetId = vectorsNeedingPreview[0].id;
-                    renderAll();
                     showToast(`Loaded ${addedAssets.length} file(s). Add your Gemini API key or enter metadata manually.`, 'info');
                 }
             } else {
-                const previewAsset = addedAssets.find(asset => asset.requiresPreviewConfirmation === true);
-                if (previewAsset) activeAssetId = previewAsset.id;
-                renderAll();
-                showToast(`Vector file loaded, but no usable preview was found. Select its matching JPG/PNG with “Choose Preview”; AI analysis will start after it is attached.`, 'warn');
+                showToast(`Loaded ${addedAssets.length} file(s). Attach a matching preview to vectors without an embedded preview.`, 'warn');
             }
         }
 
@@ -1476,22 +1463,16 @@
             asset.previewUrl = imgInfo.dataUrl;
             asset.base64Jpeg = imgInfo.dataUrl ? imgInfo.dataUrl.split(',')[1] : null;
             asset.palette = imgInfo.palette;
-            asset.dimensions = `${imgInfo.dimensions} preview`;
             asset.previewMatchVerified = false;
             asset.titleVerified = false;
             asset.autoReviewVersion = 0;
             asset.verifiedKeywords = [];
             asset.previewOriginalFile = file;
             asset.pairedPreviewKey = `${asset.id}:paired-preview`;
-            asset.epsExtractionMode = 'MATCHING RASTER PREVIEW';
-            asset.visualSummary = 'Preview attached. Check that it matches the EPS/AI artwork; analyzing the visible preview now.';
+            asset.epsExtractionMode = 'PAIRED HD PREVIEW';
             renderAll();
-            if (geminiApiKeys.length) {
-                showToast(`Preview attached to ${asset.filename}; starting image analysis.`, 'success');
-                await analyzeSingleAssetWithGemini(asset);
-            } else {
-                showToast(`Preview attached to ${asset.filename}. Add a Gemini API key, then analyze.`, 'success');
-            }
+            showToast(`Preview attached to ${asset.filename}; starting AI review.`, 'success');
+            if (geminiApiKeys.length) await analyzeSingleAssetWithGemini(asset);
         }
 
         function extractImageToDataUrl(file) {
@@ -1828,15 +1809,6 @@
         async function analyzeCurrentWithAIVision() {
             const asset = getActiveAsset();
             if (!asset) return;
-            if (!asset.base64Jpeg) {
-                if (asset.requiresPreviewConfirmation === true) {
-                    showToast('This EPS/AI has no usable embedded preview. Choose the matching JPG/PNG preview; analysis will start once it loads.', 'warn');
-                    triggerAttachEPSPreview();
-                } else {
-                    showToast('This file has no readable image preview. Re-upload it or choose a supported image file.', 'warn');
-                }
-                return;
-            }
             if (!hasGeminiApiKey() && !await updateGeminiApiStatus()) { openModal('apiModal'); showToast('Add a Gemini API key before image analysis.', 'warn'); return; }
             await analyzeSingleAssetWithGemini(asset, false);
         }
@@ -1952,7 +1924,7 @@
                                     lastWorkingGeminiModel = model;
                                     geminiApiVerified = true;
                                     updateGeminiApiStatus();
-                                    updateDiagnosticBar(`AI request completed for ${assetFilename}`, 'emerald', model);
+                                    updateDiagnosticBar(`Analysis complete for ${assetFilename}`, 'emerald', model);
                                     return parsed;
                                 }
                                 lastError = 'The model returned no usable metadata. Check the preview and try again.';
@@ -2016,17 +1988,9 @@
             if (isBatchRunning) { showToast('Batch analysis is already running.', 'info'); return; }
             if (!hasGeminiApiKey() && !await updateGeminiApiStatus()) { openModal('apiModal'); showToast('Add a Gemini API key before image analysis.', 'warn'); return; }
             const usable = (targetList || []).filter(asset => asset && asset.previewUrl && asset.base64Jpeg);
-            const vectorsWithoutPreview = (targetList || []).filter(asset => asset?.requiresPreviewConfirmation === true && !asset.base64Jpeg);
             const skipped = (targetList || []).length - usable.length;
-            if (!usable.length) {
-                const vectorWithoutPreview = (targetList || []).find(asset => asset?.requiresPreviewConfirmation === true && !asset.base64Jpeg);
-                if (vectorWithoutPreview) { activeAssetId = vectorWithoutPreview.id; renderAll(); showToast('This EPS/AI has no raster preview yet. Choose its matching JPG/PNG preview, then analyze.', 'warn'); }
-                else showToast('No readable image previews to analyze. Re-upload the image or choose a supported JPG/PNG file.', 'warn');
-                return;
-            }
-            if (skipped) showToast(vectorsWithoutPreview.length
-                ? `Skipped ${vectorsWithoutPreview.length} EPS/AI vector(s) without a matching raster preview.`
-                : `Skipped ${skipped} file(s) without a readable preview.`, 'warn');
+            if (!usable.length) { showToast('No readable image previews to analyze. Attach a preview or reload the source files.', 'warn'); return; }
+            if (skipped) showToast(`Skipped ${skipped} file(s) without a readable preview.`, 'warn');
             isBatchRunning = true;
             batchAbortRequested = false;
             const progBox = document.getElementById('batchProgressContainer');
@@ -2060,11 +2024,7 @@
             }
             const remaining = usable.length - successCount - failedCount;
             if (batchAbortRequested) showToast(`Analysis paused: ${successCount} succeeded, ${failedCount} failed, ${remaining} not attempted.`, 'info');
-            else if (vectorsWithoutPreview.length) {
-                activeAssetId = vectorsWithoutPreview[0].id;
-                renderAll();
-                showToast(`Analysis finished. ${vectorsWithoutPreview.length} EPS/AI vector(s) still need a matching JPG/PNG preview; select one and click “Choose Preview”.`, 'warn');
-            } else showToast(`Analysis finished: ${successCount} succeeded, ${failedCount} need review.`, failedCount ? 'warn' : 'success');
+            else showToast(`Analysis finished: ${successCount} succeeded, ${failedCount} need review.`, failedCount ? 'warn' : 'success');
         }
 
         async function analyzeSingleAssetWithGemini(asset, isPartOfBatch = false) {
@@ -2370,14 +2330,10 @@
             return location && date ? `${location} – ${date}: ${description}` : description;
         }
 
-        function hasVerifiedKeywordReview(asset) {
-            if (!asset || asset.autoReviewVersion !== 1 || asset.titleVerified !== true || !Array.isArray(asset.keywords) || !asset.keywords.length) return false;
+        function hasVerifiedVisualMetadata(asset) {
+            if (!asset || asset.autoReviewVersion !== 1 || asset.previewMatchVerified !== true || asset.titleVerified !== true || !Array.isArray(asset.keywords) || !asset.keywords.length) return false;
             const verified = new Set((Array.isArray(asset.verifiedKeywords) ? asset.verifiedKeywords : []).map(normalizeKeywordKey));
             return asset.keywords.some(keyword => verified.has(normalizeKeywordKey(keyword)));
-        }
-
-        function hasVerifiedVisualMetadata(asset) {
-            return hasVerifiedKeywordReview(asset) && asset.previewMatchVerified === true;
         }
 
         function validateAsset(asset, platform = currentPlatform) {
@@ -2400,14 +2356,11 @@
             const errors = [];
             const warnings = [];
             const checks = [];
-            const addCheck = (label, passed, hint, successHint = 'No issue found.') => { checks.push({ label, passed, hint, successHint }); if (!passed) errors.push(hint); };
-            addCheck('Filename', !!filenameForExport, 'A filename is required.', 'Filename is present.');
-            addCheck('Metadata review', asset.autoReviewVersion === 1 && asset.titleVerified === true, 'Review the title and metadata, then click "Approve Edits" before export.', 'Title and metadata review is approved.');
-            if (asset.requiresPreviewConfirmation === true) {
-                addCheck('EPS/AI preview match', asset.previewMatchVerified === true, 'Compare the displayed JPG/PNG preview with the actual EPS/AI artwork and confirm the checkbox.', 'EPS/AI preview match is confirmed.');
-            }
+            const addCheck = (label, passed, hint) => { checks.push({ label, passed, hint }); if (!passed) errors.push(hint); };
+            addCheck('Filename', !!filenameForExport, 'A filename is required.');
+            addCheck('Metadata Approved', asset.autoReviewVersion === 1 && asset.previewMatchVerified === true && asset.titleVerified === true, 'Click "Approve Edits" or run AI analysis to confirm metadata.');
             const duplicateFilename = assets.some(other => other.id !== asset.id && String(platform === 'vecteezy' ? String(other.filename || '').replace(/\.[^/.]+$/, '') : other.filename || '').toLowerCase() === filenameForExport.toLowerCase());
-            addCheck('Unique filename', !duplicateFilename, 'Another queued file has the same exported filename.', 'No duplicate filename found.');
+            addCheck('Unique filename', !duplicateFilename, 'Another queued file has the same exported filename.');
             if (platform === 'adobe') {
                 addCheck('Adobe filename limit', filename.length <= rules.filenameMax, 'Adobe Stock filenames must be 30 characters or fewer (click Smart Auto-Fix).');
                 addCheck('Adobe category', Number.isInteger(Number(asset.adobeCategory)) && Number(asset.adobeCategory) >= 1 && Number(asset.adobeCategory) <= 21, 'Choose an Adobe Stock category from 1 to 21.');
@@ -2432,7 +2385,7 @@
             }
             addCheck('Keyword count', keywords.length >= rules.keywordMin && keywords.length <= maxKeywords, `Use ${rules.keywordMin}–${maxKeywords} relevant keywords.`);
             addCheck('Duplicate keywords', duplicates.length === 0, duplicates.length ? `Remove duplicate keyword: “${duplicates[0]}”.` : 'No duplicate keywords detected.');
-            addCheck('Verified keywords', hasVerifiedKeywordReview(asset), 'Review and approve the title and keywords before export.', 'Keywords have passed metadata review.');
+            addCheck('Verified keywords', hasVerifiedVisualMetadata(asset), 'Click "Approve Edits" or "Verify All" to confirm your keywords.');
             const formulaRisk = [filename, title, description, asset.aiPrompt, asset.aiModel, asset.editorialLocation, ...keywords].some(value => /^[\s\t]*[=+@]/.test(String(value || '')) || /^-[^0-9]/.test(String(value || '')));
             addCheck('Spreadsheet formula safety', !formulaRisk, 'A field starts like a spreadsheet formula.');
 
@@ -2501,7 +2454,7 @@
 
                 return `
                     <div onclick="selectAsset('${asset.id}')" class="group flex items-center gap-3 p-2.5 rounded-xl border transition cursor-pointer ${isSelected ? 'bg-indigo-600/15 border-indigo-500 shadow-sm' : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700'}">
-                        ${asset.previewUrl ? `<img src="${escapeHtml(asset.previewUrl)}" alt="" class="w-14 h-14 rounded-lg object-cover bg-slate-900 flex-shrink-0 border border-slate-800">` : `<div class="w-14 h-14 rounded-lg bg-slate-900 flex-shrink-0 border border-slate-800 flex items-center justify-center" aria-label="No preview"><i class="ph-duotone ph-file-image text-xl text-amber-300"></i></div>`}
+                        <img src="${asset.previewUrl}" alt="" class="w-14 h-14 rounded-lg object-cover bg-slate-900 flex-shrink-0 border border-slate-800">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between gap-1">
                                 <p class="text-xs font-mono font-medium text-white truncate">${escapeHtml(asset.filename)}</p>
@@ -2537,20 +2490,12 @@
             activeEl.classList.remove('hidden');
             activeEl.classList.add('flex');
 
-            const inspectorImage = document.getElementById('inspectorImage');
-            const inspectorNoPreview = document.getElementById('inspectorNoPreview');
-            const readablePreviewUrl = typeof asset.previewUrl === 'string' && /^(data:image\/|https?:\/\/)/i.test(asset.previewUrl) ? asset.previewUrl : '';
-            if (readablePreviewUrl) {
-                inspectorImage.src = readablePreviewUrl;
-                inspectorImage.classList.remove('hidden');
-                inspectorNoPreview.classList.add('hidden');
-            } else {
-                inspectorImage.removeAttribute('src');
-                inspectorImage.classList.add('hidden');
-                inspectorNoPreview.classList.remove('hidden');
-            }
+            document.getElementById('inspectorImage').src = asset.previewUrl;
             document.getElementById('inspectorFilename').textContent = asset.filename;
             document.getElementById('inspectorDimensions').textContent = asset.dimensions;
+            const previewMatchWrap = document.getElementById('previewMatchReviewWrap');
+            previewMatchWrap.classList.toggle('hidden', asset.requiresPreviewConfirmation !== true);
+            document.getElementById('previewMatchVerifiedCheck').checked = asset.previewMatchVerified === true;
             document.getElementById('filenameInput').value = asset.filename;
             document.getElementById('assetTypeSelect').value = asset.assetType || 'photo';
             document.getElementById('assetMediaTypeBadge').textContent = (asset.assetType || 'photo').toUpperCase();
@@ -2694,22 +2639,15 @@
             }
 
             const checksEl = document.getElementById('validationChecks');
-            checksEl.innerHTML = val.checks.map(c => {
-                const successHint = c.successHint || 'No issue found.';
-                const previewConfirmation = c.label === 'EPS/AI preview match'
-                    ? `<label class="mt-1.5 flex items-start gap-1.5 text-[10px] leading-relaxed text-amber-100 cursor-pointer"><input type="checkbox" ${asset.previewMatchVerified === true ? 'checked' : ''} onchange="togglePreviewMatchVerified(this.checked)" class="mt-0.5"><span>I checked that this preview matches the actual vector artwork.</span></label>`
-                    : '';
-                return `
+            checksEl.innerHTML = val.checks.map(c => `
                 <div class="p-2 rounded-xl border ${c.passed ? 'bg-slate-950/60 border-slate-800' : 'bg-amber-500/5 border-amber-500/30'} flex items-start gap-2">
                     <i class="${c.passed ? 'ph-fill ph-check-circle text-emerald-400' : 'ph-fill ph-warning-circle text-amber-400'} text-sm mt-0.5"></i>
                     <div class="min-w-0 flex-1">
                         <p class="font-medium text-slate-200 text-[11px]">${escapeHtml(c.label)}</p>
-                        <p class="text-[10px] ${c.passed ? 'text-slate-400' : 'text-amber-300'}">${escapeHtml(c.passed ? successHint : c.hint)}</p>
-                        ${previewConfirmation}
+                        <p class="text-[10px] ${c.passed ? 'text-slate-400' : 'text-amber-300'}">${escapeHtml(c.hint)}</p>
                     </div>
                 </div>
-                `;
-            }).join('') + val.warnings.map(w => `<div class="p-2 rounded-xl border bg-amber-500/5 border-amber-500/30 flex items-start gap-2"><i class="ph-fill ph-warning-circle text-amber-400 text-sm mt-0.5"></i><p class="text-[10px] text-amber-200">${escapeHtml(w)}</p></div>`).join('');
+            `).join('') + val.warnings.map(w => `<div class="p-2 rounded-xl border bg-amber-500/5 border-amber-500/30 flex items-start gap-2"><i class="ph-fill ph-warning-circle text-amber-400 text-sm mt-0.5"></i><p class="text-[10px] text-amber-200">${escapeHtml(w)}</p></div>`).join('');
         }
 
         function renderKeywordChips(asset) {
